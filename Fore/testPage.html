@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>Page for testing APIs</title>
+</head>
+<body>
+<div>你没有登录</div>
+<form action="../Back/loginMake.php" method="post">
+    <input type="text" name="username">
+    <input type="text" name="password">
+    <input type="text" name="captcha">
+    <input type="submit">
+</form>
+<img src="../Back/captcha.php" onclick="this.src='../Back/captcha.php'" title="点击更换" width="500px"/>
+</body>
+</html>
