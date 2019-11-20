@@ -38,9 +38,9 @@ function updateLoginInf($conn, $username, $lastLoginIP, $lastLoginDate)
 
 function tokenSave($conn, $username, $tokenValue, $timeNow, $exp)
 {
-        $stmt = $conn->prepare("UPDATE token SET tokenValue = ?, timeNow = ?, exp = ? WHERE username = ?");
-        $stmt->bind_param('ssss', $tokenValue, $timeNow, $exp, $username);
-        return $stmt->execute();
+    $stmt = $conn->prepare("UPDATE token SET tokenValue = ?, timeNow = ?, exp = ? WHERE username = ?");
+    $stmt->bind_param('ssss', $tokenValue, $timeNow, $exp, $username);
+    return $stmt->execute();
 //        $stmt = $conn->prepare("INSERT INTO token (username, timeNow, tokenValue, exp) VALUES (?, ?, ?, ?)");
 //        $stmt->bind_param('ssss', $username, $timeNow, $tokenValue, $exp);
 //        echo 'c';
@@ -77,4 +77,76 @@ function messageSent($conn, $sender, $receiver, $message)
     $stmt = $conn->prepare("INSERT INTO messages (sender, recevier, message, sentTime) VALUES (?, ?, ?, ?)");
     $stmt->bind_param('sss', $sender, $receiver, $message, time());
     return $stmt->execute();
+}
+
+function unreadUpdate($conn, $user_1, $user_2)
+{
+    $stmt = $conn->prepare("UPDATE user_chats SET unread = 0 WHERE user_1 = ? AND user_2 = ?");
+    $stmt->bind_param('ss', $user_1, $user_2);
+    return $stmt->execute();
+}
+
+function unreadCheck($conn, $username)
+{
+    $unread = '';
+    $user_2 = '';
+    $rows = 0;
+    $result = array();
+    $stmt = $conn->prepare("SELECT unread, user_2 FROM user_chats WHERE user_1 = ? AND unread != 0");
+    $stmt->bind_param('s', $username);
+    if (!$stmt->execute()) return false;
+    $stmt->bind_result($unread, $user_2);
+    $stmt->store_result();
+    while ($stmt->fetch()) {
+        $result[$rows] = array(
+            'user_2' => $user_2,
+            'unread' => $unread,
+        );
+        $rows++;
+    }
+    return $result;
+}
+
+function messagesCheck($conn, $receiver, $sender)
+{
+    $message = '';
+    $sentTime = '';
+    $statues = '';
+    $rows = 0;
+    $result = array();
+    $stmt = $conn->prepare("SELECT message, sentTime, statues FROM messages WHERE receiver = ? AND sender = ?");
+    $stmt->bind_param('ss', $receiver, $sender);
+    if (!$stmt->execute()) return false;
+    $stmt->bind_result($message, $sentTime, $statues);
+    $stmt->store_result();
+    while ($stmt->fetch()) {
+        if(!$statues) continue;
+        $result[$rows] = array(
+            'message' => $message,
+            'sentTime' => $sentTime,
+        );
+        $rows++;
+    }
+    return $result;
+}
+
+function listCheck($conn, $username)
+{
+    $unread = '';
+    $user_2 = '';
+    $rows = 0;
+    $result = array();
+    $stmt = $conn->prepare("SELECT unread, user_2 FROM user_chats WHERE user_1 = ?");
+    $stmt->bind_param('s', $username);
+    if (!$stmt->execute()) return false;
+    $stmt->bind_result($unread, $user_2);
+    $stmt->store_result();
+    while ($stmt->fetch()) {
+        $result[$rows] = array(
+            'user_2' => $user_2,
+            'unread' => $unread,
+        );
+        $rows++;
+    }
+    return $result;
 }
