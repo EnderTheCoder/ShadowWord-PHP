@@ -201,6 +201,54 @@ function getTemUsersByUsername($conn, $username)
     $stmt->fetch();
     return $temUsers;
 }
+
+function getUserInfByUsername($conn, $username)
+{
+    $stmt = $conn->prepare("SELECT * FROM userInf where username = ?");
+    $stmt->bind_param('s', $username);
+    $result = array();
+    $stmt->bind_result(
+        $result['id'],
+        $result['username'],
+        $result['lvl'],
+        $result['views'],
+        $result['email'],
+        $result['regDate'],
+        $result['regIP'],
+        $result['lastLoginIP'],
+        $result['lastloginDate'],
+        $result['info'],
+        $result['password'],
+        $result['temUsers'],
+        $result['master']
+    );
+    $stmt->execute();
+    $stmt->fetch();
+    return $result;
+}
+
+function createChat($conn, $user_1, $user_2)
+{
+    $stmt = $conn->prepare("INSERT INTO user_chats(user_1, user_2) VALUES (?, ?)");
+    $stmt->bind_param('ss', $user_1, $user_2);
+    $stmt->execute();
+    $stmt->bind_param('ss', $user_2, $user_1);
+    $stmt->execute();
+}
+
+function userDestory($conn, $username)
+{
+    $stmt = $conn->prepare("DELETE FROM userInf WHERE username = ?");
+    $stmt->bind_param('s', $username);
+    $stmt->execute;
+}
+
+function requestChat($conn, $user_1, $user_2)
+{
+    $stmt = $conn->prepare("INSERT INTO requestsQuery(sender, receiver) VALUES (?, ?)");
+    $stmt->bind_param('ss', $user_1, $user_2);
+    $stmt->execute;
+}
 //插入新消息会增加回话的未读消息数触发器
 //create definer = Ender@`%` trigger trigger_message_update
 //    after INSERT

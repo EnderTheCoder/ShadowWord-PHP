@@ -1,18 +1,20 @@
 <?php
+
 class token
 {
-    function createToken() {
+    private function createToken()
+    {
         $randLength = 20;
         $chars = 'abcdefghijklmnopqrstuvwxyzQWERTYUIOPASDFGHJKLZXCVBNM';
         $len = strlen($chars);
         $randStr = '';
         for ($i = 0; $i < $randLength; $i++) {
-            $randStr.=$chars[rand(0, $len - 1)];
+            $randStr .= $chars[rand(0, $len - 1)];
         }
         $token = $randStr . time();
-
         return $token;
     }
+
     public function tokenSpawn($username)
     {
         $conn = mysqliConnect();
@@ -46,5 +48,30 @@ class token
             $_SESSION['token']['tokenValue'] = $newTokenValue;
             return true;
         }
+    }
+
+    public function temTokenCheck($conn, $lvl)
+    {
+        $username = addslashes(sprintf("%s", $_SESSION['token']['username']));
+        $username = substr($username, 0, 15);
+        $token = tokenGet($conn, $username);
+        if (
+            $token['exp'] + $token['timeNow'] < time() ||
+            $token['tokenValue'] != $_SESSION['token']['tokenValue']
+        ) return false;
+        else {
+            if ($lvl) {
+                $newTokenValue = $this->createToken();
+                tokenUpdate($conn, $newTokenValue, $username);
+                $_SESSION['token']['tokenValue'] = $newTokenValue;
+            }
+            return true;
+        }
+    }
+
+    public function temTokenOverTimeCheck($conn, $username)
+    {
+        $token = tokenGet($conn, $username);
+        return $token['exp'] + $token['timeNow'] >= time();
     }
 }
