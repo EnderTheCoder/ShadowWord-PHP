@@ -21,7 +21,7 @@ if (!emptyCheck($_POST['username']) ||
     !emptyCheck($_POST['email']) ||
     !emptyCheck($_POST['captcha'])
 ) stdJqSqlReturn($conn, -1);
-if ($_SESSION['captcha'] != $captcha) stdJqSqlReturn($conn, -2);
+if ($_POST['captcha'] != $captcha) stdJqSqlReturn($conn, -2);
 $username = addslashes(sprintf("%s", $_POST['username']));
 $password = addslashes(sprintf("%s", $_POST['password']));
 $email = addslashes(sprintf("%s", $_POST['email']));
@@ -29,7 +29,8 @@ $username = substr($username, 0, 15);
 $password = substr($password, 0, 40);
 $email = substr($email, 0, 30);
 $regDate = date("Y/m/d");
-$res = registCheck($conn, $username, $password, $regDate, $email);
+$regIP = $_SERVER['REMOTE_ADDR'];
+$res = registCheck($conn, $username, $password, $regDate, $email, $regIP);
 if ($res) stdJqSqlReturn($conn, 1);
 else stdJqSqlReturn($conn, -3);
 /*
