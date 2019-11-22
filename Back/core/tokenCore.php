@@ -41,7 +41,9 @@ class token
         if ($token['exp'] + $token['timeNow'] < time() ||
             $token['tokenValue'] != $_SESSION['token']['tokenValue']) return false;
         else {
-            tokenUpdate($conn, $username);
+            $newTokenValue = $this->createToken();
+            tokenUpdate($conn, $newTokenValue, $username);
+            $_SESSION['token']['tokenValue'] = $newTokenValue;
             return true;
         }
     }
