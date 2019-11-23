@@ -8,33 +8,31 @@
  * */
 header('Access-Control-Allow-Origin:*');
 header('Content-Type:application/json; charset=utf-8');
+require "./config/mysqlConfig.php";
 require "./core/customFunctions.php";
 require "./core/mysqlCore.php";
 require "./core/tokenCore.php";
 session_start();
 $captcha = $_SESSION['captcha'];
 $_SESSION['captcha'] = rand();
-$conn = mysqliConnect();
-if (!$conn) {
-    die("mysql error!");
-}
+$sql = new mysqlCore();
 if (!emptyCheck($_POST['username']) ||
     !emptyCheck($_POST['password']) ||
-    !emptyCheck($_POST['captcha'])) stdJqSqlReturn($conn, -1);
-if ($_POST['captcha'] != $captcha) stdJqSqlReturn($conn, -2);
+    !emptyCheck($_POST['captcha'])) stdJqReturn(-1);
+if ($_POST['captcha'] != $captcha) stdJqReturn(-2);
 $username = addslashes(sprintf("%s", $_POST['username']));
 $password = addslashes(sprintf("%s", $_POST['password']));
 $username = substr($username, 0, 15);
 $password = substr($password, 0, 40);
 $lastLoginDate = date("Y/m/d");
 $lastLoginIP = $_SERVER['REMOTE_ADDR'];
-$passwordGet = getPasswordByUsername($conn, $username);
+$passwordGet = $sql->getPasswordByUsername($username);
 if (!$passwordGet || $passwordGet != $password)
-    stdJqSqlReturn($conn, -3);
+    stdJqReturn(-3);
 else {
-    if (updateLoginInf($conn, $username, $lastLoginIP, $lastLoginDate)) {
+    if ($sql->updateLoginInf($username, $lastLoginIP, $lastLoginDate)) {
         $token = new token();
         $token->tokenSpawn($username);
-        stdJqSqlReturn($conn, 1);
-    } else stdJqSqlReturn($conn, -4);
+        stdJqReturn(1);
+    } else stdJqReturn(-4);
 }

@@ -5,10 +5,11 @@
  * */
 header('Access-Control-Allow-Origin:*');
 header('Content-Type:application/json; charset=utf-8');
+require "./config/mysqlConfig.php";
 require "./core/mysqlCore.php";
 require "./core/tokenCore.php";
 require "./core/customFunctions.php";
 $token = new token();
 if(!$token->tokenCheck()) stdJqReturn(-1);
-$conn = mysqliConnect();
-stdJqSqlReturn($conn, unreadCheck($conn, $_SESSION['token']['username']));
+$sql = new mysqlCore();
+stdJqReturn($sql->unreadCheck($_SESSION['token']['username']));
