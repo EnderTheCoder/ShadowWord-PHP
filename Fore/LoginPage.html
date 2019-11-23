@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+<head>
+    <!-- Standard head meta -->
+    <meta charset="utf-8">
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>ShadowWord</title>
+
+    <!--vendors styles-->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/slick-carousel/1.8.1/slick.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/slick-carousel/1.8.1/slick-theme.min.css">
+
+    <!-- CSS / Color Scheme -->
+    <link rel="stylesheet" href="css/Login_style.css" id="theme-color">
+    <!-- Microsoft AJAX-->
+    <!--<script src="http://ajax.aspnetcdn.com/ajax/jQuery/jquery-1.8.0.js"></script>-->
+
+</head>
+
+<!--11/23/2019 Push(Evilrabbit520)-->
+
+<body>
+<script type="text/javascript">
+    function login() {
+        $.ajax({
+            //几个参数需要注意一下
+            type: "POST",//方法类型
+            dataType: "jsonp",//预期服务器返回的数据类型
+            url: "../Back/loginMake.php" ,//url
+            data: $('#formLogin').serialize(),
+            success: function (result) {
+                alert(result);//打印服务端返回的数据(调试用)
+                if (result.resultCode === 200) {
+                    alert("SUCCESS");
+                }
+            },
+            error : function() {
+                alert("异常！");
+            }
+        });
+    }
+</script>
+<!--navigation-->
+<nav class="navbar navbar-expand-lg navbar-dark navbar-transparent fixed-top stick-parallex">
+    <!--Logo-->
+    <a class="navbar-brand" href="index.html">
+        <p>ShadowWord</p>
+        <!--<img src="img/Logo.png" alt="ShadowWord"/>-->
+    </a>
+    <div class="collapse navbar-collapse" id="navbarCollapse">
+        <ul class="navbar-nav ml-auto">
+            <li class="nav-item">
+                <a class="nav-link page-scroll" href="#about">首页(Home)<span class="sr-only">(current)</span></a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link page-scroll" href="#services">服务状态(Services status)</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link page-scroll" href="#team">团队(Team)</a>
+            </li>
+        </ul>
+    </div>
+</nav>
+
+<!--hero header-->
+<section class="bg-hero py-7 py-lg-0 LoginPBg">
+    <div class="container">
+        <div class="row vh-md-100">
+            <div class="col-md-7 my-md-auto mb-5">
+                <h1 class="text-white text-capitalize">Welcome to our website.</h1>
+                <div class="divider divider-sm bg-white"></div>
+                <p class="lead mb-4 text-white">
+                    We live in the world, always busy looking for treasure, here is your new destination.
+                </p>
+                <a href="#" class="btn btn-light page-scroll">注册账户</a>
+            </div>
+            <div class="col-md-5 my-md-auto">
+                <div class="card">
+                    <div class="card-header bg-primary">
+                        <h5 class="text-white text-center">Login</h5>
+                    </div>
+                    <div class="card-body pt-5">
+                        <form id="formLogin" onsubmit="return false" action="#" method="post">
+                            <div class="form-group">
+                                <input name="username" class="form-control" type="text" id="txtUserName" tabindex="1" size="15" value="" placeholder="用户名/邮箱/手机"/>
+                            </div>
+                            <div class="form-group">
+                                <input name="password" class="form-control" type="password" id="TextBox2" tabindex="2" size="40" value="" placeholder="密码"/>
+                            </div>
+                            <div class="form-group">
+                                <input name="captcha" class="form-control" type="text" id="TextBox3" tabindex="3" size="16" value="" placeholder="请输入验证码"/>
+                            </div>
+                            <div class="form-group">
+                            <img src="../Back/captcha.php" class="form-control" onclick="this.src='../Back/captcha.php'" title="点击更换" width="300px"/>
+                            </div>
+                            <div class="form-group">
+                                <button class="btn btn-primary btn-block" onclick="login()">Landing</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            <div class="col-12 text-center">
+                &copy; 2019 ShadowWord - All Rights Reserved. 前往 <a href="#" target="_blank" title="了解我们">了解我们</a> - 前往 <a href="#" title="官网首页" target="_blank">网站首页</a>
+            </div>
+        </div>
+    </div>
+</section>
+
+
+<!-- jQuery first, then Popper.js, then JS -->
+<script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.3/js/bootstrap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/feather-icons/4.0.1/feather.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/slick-carousel/1.8.1/slick.min.js"></script>
+<!-- JS -->
+<script src="js/Login_scripts.js"></script>
+<!--<script src="js/Login.js"></script>-->
+</body>
+</html>
