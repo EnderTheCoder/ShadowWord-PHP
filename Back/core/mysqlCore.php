@@ -1,4 +1,5 @@
 <?php
+
 class mysqlCore
 {
     private function mysqliConnect()
@@ -18,20 +19,6 @@ class mysqlCore
         $stmt = $conn->prepare("INSERT INTO userInf (username, password, regDate, email, regIP) VALUES (?, ?, ?, ?, ?)");
         $stmt->bind_param('sssss', $username, $password, $regDate, $email, $regIP);
         $stmt->execute();
-    }
-
-    public function getPasswordByUsername($username)
-    {
-        $conn = $this->mysqliConnect();
-        $stmt = $conn->prepare("SELECT lvl, password FROM userInf where username = ?");
-        $stmt->bind_param('s', $username);
-        $password = '';
-        $lvl = '';
-        $stmt->bind_result($lvl, $password);
-        $stmt->execute();
-        $stmt->fetch();
-        if ($lvl < 2) return false;
-        return $password;
     }
 
     public function updateLoginInf($username, $lastLoginIP, $lastLoginDate)
@@ -191,18 +178,6 @@ class mysqlCore
         $stmt = $conn->prepare("INSERT INTO userInf (username, password, regDate, lvl, master) VALUES (?, ?, ?, ?, ?)");
         $stmt->bind_param('sssss', $username, $password, date("Y/m/d"), $lvl, $master);
         return $stmt->execute();
-    }
-
-    public function getUserLvlByUsername($username)
-    {
-        $conn = $this->mysqliConnect();
-        $stmt = $conn->prepare("SELECT lvl FROM userInf where username = ?");
-        $stmt->bind_param('s', $username);
-        $lvl = '';
-        $stmt->bind_result($lvl);
-        $stmt->execute();
-        $stmt->fetch();
-        return $lvl;
     }
 
     public function getTemUsersByUsername($username)
