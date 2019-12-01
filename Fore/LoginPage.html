@@ -31,13 +31,32 @@
             url: "../Back/loginMake.php" ,//url
             data: $('#formLogin').serialize(),
             success: function (result) {
-                alert(result);//打印服务端返回的数据(调试用)
-                if (result.resultCode === 200) {
-                    alert("SUCCESS");
+                //alert(result);打印服务端返回的数据(调试用)
+                switch (result) {
+                    case 1:
+                        alert("登录成功，点击确认后自动跳转");
+                        window.location.href="MainPage.html";
+                        break;
+                    case -1:
+                        alert("输入存在空，请检查必填项后重试");
+                        break;
+                    case -2:
+                        alert("验证码错误，请检查验证码后重试");
+                        break;
+                    case -3:
+                        alert("用户名或密码错误");
+                        break;
+                    case -4:
+                        alert("数据库发生故障，请联系管理员");
+                        break;
+                    case -5:
+                        alert("您属于临时用户，请转至临时用户登录地址，确认后自动跳转");
+                        window.location.href="#";
+                        break;
                 }
             },
             error : function() {
-                alert("异常！");
+                alert("服务器异常！");
             }
         });
     }
@@ -74,7 +93,7 @@
                 <p class="lead mb-4 text-white">
                     We live in the world, always busy looking for treasure, here is your new destination.
                 </p>
-                <a href="#" class="btn btn-light page-scroll">注册账户</a>
+                <a href="Registered.html" class="btn btn-light page-scroll">注册账户</a>
             </div>
             <div class="col-md-5 my-md-auto">
                 <div class="card">
@@ -90,7 +109,7 @@
                                 <input name="password" class="form-control" type="password" id="TextBox2" tabindex="2" size="40" value="" placeholder="密码"/>
                             </div>
                             <div class="form-group">
-                                <input name="captcha" class="form-control" type="text" id="TextBox3" tabindex="3" size="16" value="" placeholder="请输入验证码"/>
+                                <input name="captcha" class="form-control" type="text" id="TextBox3" tabindex="3" size="16" value="" placeholder="请输入验证码" AUTOCOMPLETE="off"/>
                             </div>
                             <div class="form-group">
                             <img src="../Back/captcha.php" class="form-control" onclick="this.src='../Back/captcha.php'" title="点击更换" width="300px"/>
