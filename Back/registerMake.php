@@ -25,6 +25,11 @@ if($username == $user['username']) stdJqReturn(-3);
 $regDate = date("Y/m/d");
 $regIP = $_SERVER['REMOTE_ADDR'];
 $sql->registCheck($username, $password, $regDate, $email, $regIP);
+$mailTo = $_POST['email'];
+$subject = "请完成您在ShadowWord的注册";
+$body = "点击链接即可完成验证";
+$body = $body . URL;
+sendMailTo($mailTo, $subject, $body);
 stdJqReturn(1);
 /*
  * 权限分为6级

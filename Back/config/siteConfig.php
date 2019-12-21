@@ -1,2 +1,2 @@
 <?php
-define("url", "http://localhost", true);
+define("URL", "http://localhost/", true);
