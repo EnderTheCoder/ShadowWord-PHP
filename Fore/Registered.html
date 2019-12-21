@@ -1,68 +1,100 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh-CN">
 
 <head>
     <!-- Standard head meta -->
     <meta charset="utf-8">
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <title>SignUP-ShadowWord</title>
-
     <link rel="stylesheet" href="css/BRegistered.css">
     <link rel="stylesheet" href="css/materialize.min.css">
     <link rel="stylesheet" href="css/tooplate.css">
     <link rel="stylesheet" href="css/Login_style.css" id="theme-color">
+    <script src="js/jquery-3.4.1.js"></script>
 </head>
-
 <body id="register">
-    <div class="container">
-        <div class="row">
-            <div class="col-xl-6 col-lg-6 col-md-6 col-sm-12">
-                <header class="mb-5">
-                    <h3 class="mt-0 white-text">Sign-up Form</h3>
-                    <br/>
-                    <p class="grey-text mb-4">一回头， 少年你依旧.</p>
-                </header>
-            </div>
-            <div class="col-xl-6 col-lg-6 col-md-6 col-sm-12">
-                <form action="" method="post" class="tm-signup-form">
-                    <div class="input-field">
-                        <input class="validate" placeholder="Username" id="username" name="username" type="text">
-                    </div>
-                    <div class="input-field">
-                        <input class="validate" placeholder="Password" id="password" name="password" type="password" class="validate">
-                    </div>
-                    <div class="input-field">
-                        <input class="validate" placeholder="Re-type Password" id="password2" name="password2" type="password">
-                    </div>
-                    <div class="input-field">
-                        <input class="validate" placeholder="Email" id="email" name="email" type="email">
-                    </div>
-                    <div class="input-field">
-                        <input class="validate" placeholder="Phone" id="phone" name="phone" type="tel">
-                    </div>
-                    <div class="text-right mt-4">
-                        <button type="submit" class="btn btn-primary ">Sign Up</button>
-                    </div>
-                </form>
-            </div>
-        </div>
-        <footer class="row tm-mt-big mb-3">
-            <div class="col-xl-12">
-                <p class="text-center grey-text text-lighten-2 tm-footer-text-small">
-                    &copy; 2019 ShadowWord - All Rights Reserved. 前往 <a href="#" target="_blank" title="了解我们">了解我们</a> - 前往 <a href="#" title="官网首页" target="_blank">网站首页</a>
-                </p>
-            </div>
-        </footer>
-    </div>
-
-    <script src="js/jquery-3.2.1.slim.min.js"></script>
-    <script src="js/materialize.min.js"></script>
-    <script>
-        $(document).ready(function () {
-            $('select').formSelect();
+<!--jquery ajax and input-validation by Ender-->
+<script type="text/javascript">
+    function register() {
+        if($(#password) !== $(#password2)) {
+            alert("两次输入的密码不一致，请检查后重试");
+            return;
+        }
+        $.ajax({
+            type: "POST",
+            dataType: "jsonp",
+            url: "../Back/registerMake.php",
+            data: $('#formRegister').serialize(),
+            success: function (result) {
+                //alert(result);
+                switch (result) {
+                    case 1:
+                        alert("注册成功，点击确认后自动跳转");
+                        window.location.href = "MainPage.html";
+                        break;
+                    case -1:
+                        alert("输入存在空，请检查必填项后重试");
+                        break;
+                    case -2:
+                        alert("验证码错误，请检查验证码后重试");
+                        break;
+                    case -3:
+                        alert("该用户名已被注册");
+                        break;
+                }
+            },
+            error: function () {
+                alert("服务器异常！");
+            }
         });
-    </script>
+    }
+</script>
+<div class="container">
+    <div class="row">
+        <div class="col-xl-6 col-lg-6 col-md-6 col-sm-12">
+            <header class="mb-5">
+                <h3 class="mt-0 white-text">Sign-up</h3>
+                <br/>
+                <p class="grey-text mb-4">一回头， 少年你依旧.</p>
+            </header>
+        </div>
+        <div class="col-xl-6 col-lg-6 col-md-6 col-sm-12">
+            <form onsubmit="return false" action="#" method="post" class="tm-signup-form" id="formRegister">
+                <div class="input-field">
+                    <input class="validate" placeholder="Username" id="username" name="username" type="text">
+                </div>
+                <div class="input-field">
+                    <input class="validate" placeholder="Password" id="password" name="password" type="password">
+                </div>
+                <div class="input-field">
+                    <input class="validate" placeholder="Re-type Password" id="password2" name="password2"
+                           type="password">
+                </div>
+                <div class="input-field">
+                    <input class="validate" placeholder="Email" id="email" name="email" type="email">
+                </div>
+                <div class="input-field">
+                    <input class="validate" placeholder="Captcha" id="captcha" name="captcha" type="text" AUTOCOMPLETE="off">
+                </div>
+                <div class="form-group">
+                    <img src="../Back/captcha.php" class="form-control"
+                         onclick="this.src='../Back/captcha.php'" title="点击更换" width="200px"/>
+                </div>
+                <div class="text-right mt-4">
+                    <button class="btn btn-primary " onclick="register()">Sign Up</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    <footer class="row tm-mt-big mb-3">
+        <div class="col-xl-12">
+            <p class="text-center grey-text text-lighten-2 tm-footer-text-small">
+                &copy; 2019 ShadowWord - All Rights Reserved. 前往 <a href="#" target="_blank" title="了解我们">了解我们</a> - 前往
+                <a href="#" title="官网首页" target="_blank">网站首页</a>
+            </p>
+        </div>
+    </footer>
+</div>
 </body>
-
 </html>

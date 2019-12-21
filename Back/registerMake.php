@@ -3,7 +3,7 @@
  * 返回-1代表输入存在空
  * 返回-2代表验证码错误
  * 返回-3代表用户名已被注册
- * 返回1代表登陆成功
+ * 返回1代表注册成功
  * */
 require "superHeader.php";
 $captcha = $_SESSION['captcha'];

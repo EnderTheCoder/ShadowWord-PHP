@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="zh-cn">
+<html lang="zh-CN">
 <head>
     <!-- Standard head meta -->
     <meta charset="utf-8">
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <title>Login-ShadowWord</title>
 
@@ -28,14 +28,14 @@
             //几个参数需要注意一下
             type: "POST",//方法类型
             dataType: "jsonp",//预期服务器返回的数据类型
-            url: "../Back/loginMake.php" ,//url
+            url: "../Back/loginMake.php",//url
             data: $('#formLogin').serialize(),
             success: function (result) {
                 //alert(result);打印服务端返回的数据(调试用)
                 switch (result) {
                     case 1:
                         alert("登录成功，点击确认后自动跳转");
-                        window.location.href="MainPage.html";
+                        window.location.href = "MainPage.html";
                         break;
                     case -1:
                         alert("输入存在空，请检查必填项后重试");
@@ -51,11 +51,11 @@
                         break;
                     case -5:
                         alert("您属于临时用户，请转至临时用户登录地址，确认后自动跳转");
-                        window.location.href="#";
+                        window.location.href = "#";
                         break;
                 }
             },
-            error : function() {
+            error: function () {
                 alert("服务器异常！");
             }
         });
@@ -98,31 +98,36 @@
             <div class="col-md-5 my-md-auto">
                 <div class="card">
                     <div class="card-header bg-primary">
-                        <h5 class="text-white text-center">Login</h5>
+                        <h5 class="text-white text-center">Sign-in</h5>
                     </div>
                     <div class="card-body pt-5">
                         <form id="formLogin" onsubmit="return false" action="#" method="post">
                             <div class="form-group">
-                                <input name="username" class="form-control" type="text" id="txtUserName" tabindex="1" size="15" value="" placeholder="用户名/邮箱/手机"/>
+                                <input name="username" class="form-control" type="text" id="txtUserName" tabindex="1"
+                                       size="15" value="" placeholder="用户名/邮箱/手机"/>
                             </div>
                             <div class="form-group">
-                                <input name="password" class="form-control" type="password" id="TextBox2" tabindex="2" size="40" value="" placeholder="密码"/>
+                                <input name="password" class="form-control" type="password" id="TextBox2" tabindex="2"
+                                       size="40" value="" placeholder="密码"/>
                             </div>
                             <div class="form-group">
-                                <input name="captcha" class="form-control" type="text" id="TextBox3" tabindex="3" size="16" value="" placeholder="请输入验证码" AUTOCOMPLETE="off"/>
+                                <input name="captcha" class="form-control" type="text" id="TextBox3" tabindex="3"
+                                       size="16" value="" placeholder="请输入验证码" AUTOCOMPLETE="off"/>
                             </div>
                             <div class="form-group">
-                            <img src="../Back/captcha.php" class="form-control" onclick="this.src='../Back/captcha.php'" title="点击更换" width="300px"/>
+                                <img src="../Back/captcha.php" class="form-control"
+                                     onclick="this.src='../Back/captcha.php'" title="点击更换" width="300px"/>
                             </div>
                             <div class="form-group">
-                                <button class="btn btn-primary btn-block" onclick="login()">Landing</button>
+                                <button class="btn btn-primary btn-block" onclick="login()">Sign in</button>
                             </div>
                         </form>
                     </div>
                 </div>
             </div>
             <div class="col-12 text-center">
-                &copy; 2019 ShadowWord - All Rights Reserved. 前往 <a href="#" target="_blank" title="了解我们">了解我们</a> - 前往 <a href="#" title="官网首页" target="_blank">网站首页</a>
+                &copy; 2019 ShadowWord - All Rights Reserved. 前往 <a href="#" target="_blank" title="了解我们">了解我们</a> - 前往
+                <a href="#" title="官网首页" target="_blank">网站首页</a>
             </div>
         </div>
     </div>
