@@ -16,5 +16,18 @@ function sendMailTo($mailTo, $mailSub, $mailBody)
     $mailType = "HTML";
     $smtp = new smtp(SMTP_SERVER_ADDR, SMTP_SERVER_PORT, true, SMTP_USER, SMTP_PASS);
     $smtp->debug = FALSE; //是否显示发送的调试信息
-    $smtp->sendmail($mailTo, SMTP_USER_EMAIL, $mailSub, $mailBody, $mailType);
+    return $smtp->sendmail($mailTo, SMTP_USER_EMAIL, $mailSub, $mailBody, $mailType);
+}
+
+function keySpawn()
+{
+    $randLength = 20;
+    $chars = 'abcdefghijklmnopqrstuvwxyzQWERTYUIOPASDFGHJKLZXCVBNM';
+    $len = strlen($chars);
+    $randStr = '';
+    for ($i = 0; $i < $randLength; $i++) {
+        $randStr .= $chars[rand(0, $len - 1)];
+    }
+    $Key = $randStr . time();
+    return $Key;
 }

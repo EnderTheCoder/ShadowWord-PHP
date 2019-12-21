@@ -77,7 +77,6 @@ class smtp
             fclose($this->sock);
             $this->log_write("Disconnected from remote host\n");
         }
-        echo "<br>";
         //echo $header;
         return $sent;
     }

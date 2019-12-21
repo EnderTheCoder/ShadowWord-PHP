@@ -244,6 +244,12 @@ class mysqlCore
         $stmt->execute();
     }
 
+    public function saveRegisterKey($backKey)
+    {
+        $conn = $this->mysqliConnect();
+
+    }
+
 }
 //插入新消息会增加回话的未读消息数触发器
 //create definer = Ender@`%` trigger trigger_message_update

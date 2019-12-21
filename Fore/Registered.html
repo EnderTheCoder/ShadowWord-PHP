@@ -17,7 +17,8 @@
 <!--jquery ajax and input-validation by Ender-->
 <script type="text/javascript">
     function register() {
-        if($(#password) !== $(#password2)) {
+        $("#captcha").src = '../Back/captcha.php';
+        if($("#password").val() !== $("#password2").val()) {
             alert("两次输入的密码不一致，请检查后重试");
             return;
         }
@@ -42,6 +43,8 @@
                     case -3:
                         alert("该用户名已被注册");
                         break;
+                    default:
+                        alert("DEBUG");
                 }
             },
             error: function () {
@@ -78,7 +81,7 @@
                     <input class="validate" placeholder="Captcha" id="captcha" name="captcha" type="text" AUTOCOMPLETE="off">
                 </div>
                 <div class="form-group">
-                    <img src="../Back/captcha.php" class="form-control"
+                    <img src="../Back/captcha.php" class="form-control" id="captcha-img"
                          onclick="this.src='../Back/captcha.php'" title="点击更换" width="200px"/>
                 </div>
                 <div class="text-right mt-4">
