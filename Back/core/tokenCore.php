@@ -12,6 +12,7 @@ class token
             $randStr .= $chars[rand(0, $len - 1)];
         }
         $token = $randStr . time();
+        $token = base64_encode($token);
         return $token;
     }
 

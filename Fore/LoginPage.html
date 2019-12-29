@@ -53,6 +53,12 @@
                         alert("您属于临时用户，请转至临时用户登录地址，确认后自动跳转");
                         window.location.href = "#";
                         break;
+                    case -6:
+                        alert("您输入的账号目前未完成邮箱验证，请进入邮箱进行检查");
+                        break;
+                    case -7:
+                        alert("您输入的账号目前已被冻结或封禁，请联系管理员解封");
+                        break;
                 }
             },
             error: function () {

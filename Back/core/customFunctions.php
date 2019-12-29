@@ -29,5 +29,6 @@ function keySpawn()
         $randStr .= $chars[rand(0, $len - 1)];
     }
     $Key = $randStr . time();
+    $Key = base64_encode($Key);
     return $Key;
 }

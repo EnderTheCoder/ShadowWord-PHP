@@ -1,10 +1,41 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh-CN">
 <head>
-    <meta charset="UTF-8">
-    <title>Title</title>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <script src="js/jquery-3.4.1.js"></script>
+    <script src="js/bootstrap.min.js"></script>
+    <script src="js/CustomFunctions.js"></script>
+    <title>邮箱链接验证页</title>
 </head>
 <body>
-
+<script type="text/javascript">
+    if(GetQueryString("key") == null) {
+        alert("该邮箱链接缺少参数，将重定向到主页！");
+        window.location.href = "MainPage.html";
+    }
+        $.ajax({
+            type: "POST",
+            dataType: "jsonp",
+            url: "../Back/emailKeyCheck.php",//url
+            data: {key: GetQueryString("key")},
+            success: function (data) {
+                if (data.code === false) {
+                    alert("该邮箱链接无效，将重定向到主页！");
+                    window.location.href = "MainPage.html";
+                } else {
+                    alert(data.message);
+                    window.location.href = data.link;
+                }
+            },
+            error: function () {
+                alert("服务器异常！");
+            }
+        });
+</script>
 </body>
 </html>

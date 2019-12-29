@@ -13,12 +13,18 @@ class mysqlCore
         return $conn;
     }
 
-    public function registCheck($username, $password, $regDate, $email, $regIP)
+    public function registerCheck($username, $password, $regDate, $email, $regIP, $state)
     {
         $conn = $this->mysqliConnect();
-        $stmt = $conn->prepare("INSERT INTO userInf (username, password, regDate, email, regIP) VALUES (?, ?, ?, ?, ?)");
-        $stmt->bind_param('sssss', $username, $password, $regDate, $email, $regIP);
+        $stmt = $conn->prepare("INSERT INTO userInf (username, password, regDate, email, regIP, state) VALUES (?, ?, ?, ?, ?, ?)");
+        $stmt->bind_param('ssssss', $username, $password, $regDate, $email, $regIP, $state);
         $stmt->execute();
+        /*
+         * 用户状态state
+         * 1:正常用户
+         * 2:注册中未验证用户
+         * 3:封禁但未注销用户
+         * */
     }
 
     public function updateLoginInf($username, $lastLoginIP, $lastLoginDate)
@@ -74,7 +80,7 @@ class mysqlCore
     public function messageSent($sender, $receiver, $message)
     {
         $conn = $this->mysqliConnect();
-        $stmt = $conn->prepare("insert into messages(sender, receiver, message, sentTime) VALUES (?, ?, ?, ?)");
+        $stmt = $conn->prepare("INSERT INTO messages(sender, receiver, message, sentTime) VALUES (?, ?, ?, ?)");
         $stmt->bind_param('ssss', $sender, $receiver, $message, time());
         return $stmt->execute();
     }
@@ -175,7 +181,7 @@ class mysqlCore
         $stmt = $conn->prepare("UPDATE userInf SET temUsers = temUsers + 1 WHERE username = ?");
         $stmt->bind_param('s', $master);
         $stmt->execute();
-        $stmt = $conn->prepare("INSERT INTO userInf (username, password, regDate, lvl, master) VALUES (?, ?, ?, ?, ?)");
+        $stmt = $conn->prepare("INSERT INTO userInf (username, password, regDate, lvl, master, state) VALUES (?, ?, ?, ?, ?, 1)");
         $stmt->bind_param('sssss', $username, $password, date("Y/m/d"), $lvl, $master);
         return $stmt->execute();
     }
@@ -195,7 +201,7 @@ class mysqlCore
     public function getUserInfByUsername($username)
     {
         $conn = $this->mysqliConnect();
-        $stmt = $conn->prepare("SELECT id, username, lvl, views, email, regDate, regIP, lastloginIP, lastloginDate, info, password, temUsers, master FROM userInf where username = ?");
+        $stmt = $conn->prepare("SELECT id, username, lvl, views, email, regDate, regIP, lastloginIP, lastloginDate, info, password, temUsers, master, state FROM userInf where username = ?");
         $stmt->bind_param('s', $username);
         $result = array();
         $stmt->bind_result(
@@ -207,11 +213,12 @@ class mysqlCore
             $result['regDate'],
             $result['regIP'],
             $result['lastLoginIP'],
-            $result['lastloginDate'],
+            $result['lastLoginDate'],
             $result['info'],
             $result['password'],
             $result['temUsers'],
-            $result['master']
+            $result['master'],
+            $result['state']
         );
         $stmt->execute();
         $stmt->fetch();
@@ -228,7 +235,7 @@ class mysqlCore
         $stmt->execute();
     }
 
-    public function userDestory($username)
+    public function userDestroy($username)
     {
         $conn = $this->mysqliConnect();
         $stmt = $conn->prepare("DELETE FROM userInf WHERE username = ?");
@@ -244,12 +251,47 @@ class mysqlCore
         $stmt->execute();
     }
 
-    public function saveRegisterKey($backKey)
+    public function saveEmailKey($key, $action, $username)
     {
+        /*
+         * 邮件返回动作类型action
+         * register：注册验证码返回
+         * resetPassword：重置密码返回
+         * changePassword：修改密码返回
+         * */
         $conn = $this->mysqliConnect();
-
+        $stmt = $conn->prepare("INSERT INTO emailKey(keyValue, `action`, username) VALUES (?, ?, ?)");
+        $stmt->bind_param('sss', $key, $action, $username);
+        $stmt->execute();
     }
 
+    public function getEmailKey($key)
+    {
+        $conn = $this->mysqliConnect();
+        $stmt = $conn->prepare("SELECT `keyValue`, `username`, `action` FROM `emailKey` WHERE `keyValue` = ?");
+        $stmt->bind_param('s', $key);
+        $result = array();
+        $stmt->bind_result(
+            $result['keyValue'],
+            $result['username'],
+            $result['action']
+            );
+        $stmt->execute();
+        $stmt->fetch();
+        $conn = $this->mysqliConnect();
+        $stmt = $conn->prepare("DELETE FROM `emailKey` WHERE `keyValue` = ?");
+        $stmt->bind_param('s', $key);
+        $stmt->execute();
+        return $result;
+    }
+
+    public function enableUser($username)
+    {
+        $conn = $this->mysqliConnect();
+        $stmt = $conn->prepare("UPDATE `userInf` SET `state` = 1 WHERE `username` = ?");
+        $stmt->bind_param('s', $username);
+        $stmt->execute();
+    }
 }
 //插入新消息会增加回话的未读消息数触发器
 //create definer = Ender@`%` trigger trigger_message_update

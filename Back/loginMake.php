@@ -5,6 +5,8 @@
  * 返回-3代表账号或密码错误
  * 返回-4代表未知数据库错误
  * 返回-5代表临时用户入口错误
+ * 返回-6代表用户未完成邮箱验证
+ * 返回-7代表用户已被封禁
  * 返回1代表登陆成功
  * */
 require "superHeader.php";
@@ -21,8 +23,10 @@ $password = substr($password, 0, 40);
 $lastLoginDate = date("Y/m/d");
 $lastLoginIP = $_SERVER['REMOTE_ADDR'];
 $user = $sql->getUserInfByUsername($username);
+if ($user['state'] == 3) stdJqReturn(-7);
+if ($user['state'] == 2) stdJqReturn(-6);
 if ($user['lvl'] < 2) stdJqReturn(-5);
-if (!$user || $user['password'] != $password)
+if ($user['username'] != $username|| $user['password'] != $password)
     stdJqReturn(-3);
 else {
     if ($sql->updateLoginInf($username, $lastLoginIP, $lastLoginDate)) {
