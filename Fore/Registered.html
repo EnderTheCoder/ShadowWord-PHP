@@ -28,10 +28,9 @@
             url: "../Back/registerMake.php",
             data: $('#formRegister').serialize(),
             success: function (result) {
-                //alert(result);
                 switch (result) {
                     case 1:
-                        alert("注册成功，点击确认后自动跳转");
+                        alert("注册成功，请到邮箱查收验证邮件以完成注册");
                         window.location.href = "MainPage.html";
                         break;
                     case -1:
