@@ -1,0 +1,173 @@
+#Main {
+    position: absolute;
+    height: calc(100vh);
+    width: calc(100vw);
+    z-index: 0;
+}
+
+#MainTopBar {
+    height: 60px;
+    width: calc(100vw);
+    background-color: #2195EB;
+}
+
+#contacts {
+    height: 30px;
+    width: 30px;
+    /*margin-left: 20px;*/
+    /*margin-top: 20px;*/
+    /*margin-bottom: 20px;*/
+    position: absolute;
+    top: 15px;
+    left: 15px;
+}
+
+#TopBarCenterText {
+    line-height: 30px;
+    position: absolute;
+    top: 15px;
+    left: 60px;
+    text-align: center;
+    font-size: 26px;
+    color: #FFFFFF;
+    width: calc(100vw - 120px);
+}
+
+#add {
+    height: 30px;
+    width: 30px;
+    /*margin-right: 20px;*/
+    /*margin-top: 20px;*/
+    /*margin-bottom: 20px;*/
+    position: absolute;
+    top:15px;
+    right: 15px;
+}
+
+#MainSearchBar {
+    width: calc(100vw);
+    height: 40px;
+    background-color: #FFFFFF;
+    border-bottom: #D8DCDF solid 1px;
+}
+
+#MainSearchJump {
+    /*margin-left: auto;*/
+    /*margin-right: auto;*/
+    /*margin-bottom: 5px;*/
+    /*margin-top: 5px;*/
+    margin: 5px auto 5px auto;
+    background-color: #F7F8FA;
+    width: calc(95vw);
+    height: 30px;
+    text-align: center;
+    line-height: 30px;
+    color: #A9A9A9;
+    border-radius: 3px;
+}
+
+/*#SearchImg {*/
+/*    height: 20px;*/
+/*}*/
+
+#MainMessageList {
+    overflow: auto;
+    width: calc(100vw);
+    height: calc(100vh - 100px);
+}
+
+.MessageBlock {
+    height: 60px;
+    width: calc(100vw);
+    background-color: #FFFFFF;
+}
+
+.MessageBlock:hover {
+    background-color: #EDEFEE;
+}
+
+.portrait {
+    /*float: left;*/
+    height: 50px;
+    margin-top: 5px;
+    /*margin-left: 10px;*/
+    /*margin-right: 10px;*/
+    /*margin-bottom: 10px;*/
+    /*margin: 10px;*/
+    position: absolute;
+    left: 5px;
+}
+
+.MessageLeft {
+    /*float: left;*/
+    width: 215px;
+    height: 60px;
+    position: absolute;
+    left: 65px;
+}
+
+.MessageTittle {
+    color: black;
+    margin-top: 10px;
+    line-height: 20px;
+    font-size: 18px;
+}
+
+.MessageSummary {
+    color: #828282;
+    margin-bottom: 10px;
+    line-height: 30px;
+    font-size: 15px;
+}
+
+.MessageRight {
+    /*float: left;*/
+    width: 60px;
+    height: 60px;
+    /*margin-right: 0;*/
+    position: absolute;
+    right: 0;
+}
+
+.MessageDate {
+    color: #828282;
+    margin-top: 10px;
+    line-height: 20px;
+    font-size: 12px;
+}
+
+.RedDot {
+    color: white;
+    background-color: red;
+    border-radius: 10px;
+    font-size: 13px;
+    width: 30px;
+    line-height: 20px;
+    padding-left: 5px;
+    margin-top: 3px;
+    position: absolute;
+    right: 8px;
+}
+
+#MainBottomBar {
+    height: 50px;
+    width: calc(100vw);
+    background-color: #FEFEFE;
+    border-top: #D8DCDF solid 1px;
+    position: fixed;
+    bottom: 0;
+}
+
+#BottomMessages {
+    height: 40px;
+    margin-top: 5px;
+    position: absolute;
+    left: 25%
+}
+
+#BottomSettings {
+    height: 40px;
+    margin-top: 5px;
+    position: absolute;
+    right: 25%
+}
