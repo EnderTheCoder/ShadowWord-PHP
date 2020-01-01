@@ -28,7 +28,7 @@
     top: 15px;
     left: 60px;
     text-align: center;
-    font-size: 26px;
+    font-size: 24px;
     color: #FFFFFF;
     width: calc(100vw - 120px);
 }
@@ -149,6 +149,12 @@
     right: 8px;
 }
 
+#FixBlock {
+    height: 60px;
+    width: calc(100vw);
+    background-color: #FFFFFF;
+}
+
 #MainBottomBar {
     height: 50px;
     width: calc(100vw);
@@ -170,4 +176,88 @@
     margin-top: 5px;
     position: absolute;
     right: 25%
+}
+
+#MessagesTopBar {
+    height: 60px;
+    width: calc(100vw);
+    background-color: #F5F6F8;
+    position: absolute;
+    top: 0;
+}
+
+.ReturnIcon {
+    height: 30px;
+    width: 30px;
+    position: absolute;
+    top: 15px;
+    left: 15px;
+}
+
+#TopUserName {
+    margin-left: auto;
+    margin-right: auto;
+    line-height: 60px;
+    text-align: center;
+    font-size: 24px;
+}
+
+.SearchIcon {
+    height: 30px;
+    width: 30px;
+    position: absolute;
+    top: 15px;
+    right: 60px;
+}
+
+.FriendIcon {
+    height: 30px;
+    width: 30px;
+    position: absolute;
+    top: 15px;
+    right: 15px;
+}
+
+#MessagesArea {
+    height: calc(100vh - 140px);
+    width: calc(100vw);
+    margin-top: 60px;
+    background-color: #F2F3F5;
+    overflow: auto;
+}
+
+#MessageEditor {
+    height: 80px;
+    width: calc(100vw);
+    position: absolute;
+    bottom: 0;
+    background-color: #FAFAFA;
+}
+
+#EditorTop {
+    height: 40px;
+    width: calc(100vw);
+    border-bottom:#A9A9A9 solid 1px;
+}
+
+#UserText {
+    border: none;
+    height: 35px;
+    margin-top: 2px;
+    margin-left: 2px;
+    margin-bottom: 2px;
+    background-color: #FAFAFA;
+    width: calc(100vw - 81px);
+}
+
+#SubmitForText {
+    border: none;
+    background-color: #FAFAFA;
+    height: 39px;
+    width: 80px;
+    text-align: center;
+    color: #0689F9;
+    position: absolute;
+    right: 0;
+    font-size: 18px;
 }

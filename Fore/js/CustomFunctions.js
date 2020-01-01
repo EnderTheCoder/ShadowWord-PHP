@@ -1,3 +1,6 @@
+/**
+ * @return {string}
+ */
 function GetQueryString(name)
 {
     var reg = new RegExp("(^|&)"+ name +"=([^&]*)(&|$)");
@@ -5,6 +8,9 @@ function GetQueryString(name)
     if(r!=null)return  unescape(r[2]); return null;
 }
 
+/**
+ * @return {boolean}
+ */
 function JudgeDevice() {
     //PC返回true，PE返回false
     const userAgentInfo = navigator.userAgent;
