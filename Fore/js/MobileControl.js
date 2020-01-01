@@ -77,7 +77,10 @@ function PollListData() {
                 MessageBlock = MessageBlock.replace("RP-Tittle", jsons['messages'][i]['user_2']);
                 MessageBlock = MessageBlock.replace("RP-Summary", jsons['messages'][i]['latestMessage']);
                 if (jsons['messages'][i]['unread'] === 0) MessageBlock = MessageBlock.replace("<div class=\"RedDot\">RP-Unread</div>\n", '');
-                else MessageBlock = MessageBlock.replace("RP-Unread", jsons['messages'][i]['unread']);
+                else if (jsons['messages'][i]['unread'] > 99)
+                    MessageBlock = MessageBlock.replace("RP-Unread", '99+');
+                else
+                    MessageBlock = MessageBlock.replace("RP-Unread", jsons['messages'][i]['unread']);
                 MessageList.append(MessageBlock);
             }
             MessageList.append(MessageEnd);
