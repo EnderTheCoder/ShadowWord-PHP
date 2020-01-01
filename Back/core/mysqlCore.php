@@ -77,7 +77,7 @@ class mysqlCore
         return $stmt->execute();
     }
 
-    public function messageSent($sender, $receiver, $message)
+    public function messageSend($sender, $receiver, $message)
     {
         $conn = $this->mysqliConnect();
         $stmt = $conn->prepare("INSERT INTO messages(sender, receiver, message, sentTime) VALUES (?, ?, ?, ?)");
@@ -85,12 +85,24 @@ class mysqlCore
         return $stmt->execute();
     }
 
+    public function chatUpdate($user_1, $user_2, $summary)//user_1 send to user_2
+    {
+        $conn = $this->mysqliConnect();
+        $stmt = $conn->prepare("UPDATE user_chats SET latestMessage = ? WHERE (user_1 = ? AND user_2 = ?) OR (user_1 = ? AND user_2 = ?)");
+        $stmt->bind_param('sssss', $summary, $user_1, $user_2, $user_2, $user_1);
+        $stmt->execute();
+        $conn = $this->mysqliConnect();
+        $stmt = $conn->prepare("UPDATE user_chats SET unread = unread + 1 WHERE user_1 = ? AND user_2 = ?");
+        $stmt->bind_param('ss', $user_2, $user_1);
+        $stmt->execute();
+    }
+
     public function unreadUpdate($user_1, $user_2)
     {
         $conn = $this->mysqliConnect();
         $stmt = $conn->prepare("UPDATE user_chats SET unread = 0 WHERE user_1 = ? AND user_2 = ?");
         $stmt->bind_param('ss', $user_1, $user_2);
-        return $stmt->execute();
+        $stmt->execute();
     }
 
     public function unreadCheck($username)
@@ -155,22 +167,28 @@ class mysqlCore
 
     public function listCheck($username)
     {
+        $result = array(
+            'rows' => 0,
+            'unread' => 0,
+            'messages' => array(),
+        );
         $conn = $this->mysqliConnect();
-        $unread = '';
+        $unread = 0;
         $user_2 = '';
-        $rows = 0;
-        $result = array();
-        $stmt = $conn->prepare("SELECT unread, user_2 FROM user_chats WHERE user_1 = ?");
+        $latestMessage = '';
+        $stmt = $conn->prepare("SELECT unread, user_2, latestMessage FROM user_chats WHERE user_1 = ?");
         $stmt->bind_param('s', $username);
         if (!$stmt->execute()) return false;
-        $stmt->bind_result($unread, $user_2);
+        $stmt->bind_result($unread, $user_2, $latestMessage);
         $stmt->store_result();
         while ($stmt->fetch()) {
-            $result[$rows] = array(
+            $result['rows']++;
+            $result['unread'] += $unread;
+            $result['messages'][$result['rows']] = array(
                 'user_2' => $user_2,
                 'unread' => $unread,
+                'latestMessage' => $latestMessage,
             );
-            $rows++;
         }
         return $result;
     }
