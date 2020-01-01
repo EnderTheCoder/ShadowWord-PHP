@@ -4,7 +4,8 @@ function emptyCheck($str) {
 }
 
 function stdJqReturn($res) {
-    $callback = $_GET['callback'];
+    if(emptyCheck($_GET['callback'])) $callback = $_GET['callback'];
+    else $callback = $_POST['callback'];
     echo $callback.'('.json_encode($res).')';
     exit;
 }
@@ -32,3 +33,4 @@ function keySpawn()
     $Key = base64_encode($Key);
     return $Key;
 }
+

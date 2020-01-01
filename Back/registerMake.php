@@ -6,6 +6,7 @@
  * 返回1代表注册成功
  * */
 require "superHeader.php";
+if ($_POST['BadLock'] != 'FUCK_HACKERS') stdJqReturn(-3);
 $captcha = $_SESSION['captcha'];
 $_SESSION['captcha'] = rand();
 if (!emptyCheck($_POST['username']) ||
@@ -13,7 +14,7 @@ if (!emptyCheck($_POST['username']) ||
     !emptyCheck($_POST['email']) ||
     !emptyCheck($_POST['captcha'])
 ) stdJqReturn(-1);
-if ($_POST['captcha'] != $captcha) stdJqReturn(-2);
+if (strtolower($_POST['captcha']) != $captcha) stdJqReturn(-2);
 $username = addslashes(sprintf("%s", $_POST['username']));
 $password = addslashes(sprintf("%s", $_POST['password']));
 $email = addslashes(sprintf("%s", $_POST['email']));

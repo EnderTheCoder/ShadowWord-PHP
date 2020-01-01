@@ -15,7 +15,7 @@ $_SESSION['captcha'] = rand();
 if (!emptyCheck($_POST['username']) ||
     !emptyCheck($_POST['password']) ||
     !emptyCheck($_POST['captcha'])) stdJqReturn(-1);
-if ($_POST['captcha'] != $captcha) stdJqReturn(-2);
+if (strtolower($_POST['captcha']) != $captcha) stdJqReturn(-2);
 $username = addslashes(sprintf("%s", $_POST['username']));
 $password = addslashes(sprintf("%s", $_POST['password']));
 $username = substr($username, 0, 15);

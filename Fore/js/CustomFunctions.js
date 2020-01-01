@@ -25,6 +25,13 @@ function JudgeDevice() {
     return flag;
 }
 
+/**
+ * @return {string}
+ */
+function BadLock() {
+    return '&BadLock=FUCK_HACKERS';
+}
+
 function JumpForDevice() {
     if (JudgeDevice()) {
         window.location.href = "PCPage.html";
