@@ -77,6 +77,18 @@ class mysqlCore
         return $stmt->execute();
     }
 
+    public function chatExistenceCheck($sender, $receiver)
+    {
+        $conn = $this->mysqliConnect();
+        $stmt = $conn->prepare("SELECT user_2 FROM user_chats WHERE user_1 = ? AND user_2 = ?");
+        $stmt->bind_param('ss', $sender, $receiver);
+        $result = '';
+        $stmt->bind_result($result);
+        $stmt->execute();
+        $stmt->fetch();
+        return boolval($result != '');
+    }
+
     public function messageSend($sender, $receiver, $message)
     {
         $conn = $this->mysqliConnect();

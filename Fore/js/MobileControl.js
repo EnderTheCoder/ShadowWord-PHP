@@ -1,12 +1,18 @@
 // function JumpToIndex() {
 //     $("#Main").css("z-index", "1000");
 // }
+
+let NowChat = [];
+NowChat['messages'] = [];
+
 function NotLoginKick() {
     alert("您的登录已经失效或不可用，请重新登录");
     window.location.href = "LoginPage.html";
 }
 
-function JumpWindow(Window) {
+function JumpWindow()
+{
+    const Window = arguments[0];
     const Main = $("#Main");
     const MessagesWindow = $("#MessagesWindow");
     switch (Window) {
@@ -15,17 +21,22 @@ function JumpWindow(Window) {
             MessagesWindow.hide();
             break;
         case "MessagesWindow":
+            NowChat['username'] = arguments[1];
+            NowChat['messages']['total'] = 0;
+            $('#TopUserName').val(NowChat['username']);
             Main.hide();
             MessagesWindow.show();
     }
 }
 
-function SwitchInitialize() {
+function SwitchInitialize()
+{
     $("#MainSettingsContainer").hide();
     $("#MessagesWindow").hide();
 }
 
-function SwitchIndex(Page) {
+function SwitchIndex(Page)
+{
     const Messages = $("#MainMessagesContainer");
     const Settings = $("#MainSettingsContainer");
     const MessagesIcon = $("#BottomMessages");
@@ -46,7 +57,8 @@ function SwitchIndex(Page) {
     }
 }
 
-function PollListData() {
+function PollListData()
+{
     const MessageList = $("#MainMessageList");
     const MessageEnd = '<div id="FixBlock"></div>';
     const MessageBlockTemplate = "<div class=\"MessageBlock\" onclick=\"JumpWindow('MessagesWindow')\">\n" +
@@ -85,6 +97,35 @@ function PollListData() {
             }
             MessageList.append(MessageEnd);
             setTimeout("PollListData()", 5000);
+        },
+        error: function () {
+
+        }
+    })
+}
+
+function SubmitMessage()
+{
+    const UserText = $('#UserText').val();
+    $.ajax({
+        url: "../Back/messageSend.php",
+        type: "POST",
+        dataType: 'jsonp',
+        async: true,
+        timeout: 5000,
+        data: {'receiver': NowChat, 'message': UserText},
+        // jsonp: "callback",
+        //crossDomain: true,
+        success: function (result) {
+            const jsons = eval(result);
+            if (jsons === -1) NotLoginKick();
+            if (jsons === -3) JumpWindow('Main');
+            if (jsons === 1) {
+                NowChat['messages'][NowChat['messages']['total']]['message'] = UserText;
+                NowChat['messages'][NowChat['messages']['total']]['type'] = 'send';
+                NowChat['messages']['total']++;
+            }
+            $('#UserText').val('');
         },
         error: function () {
 

@@ -13,6 +13,7 @@ $message = substr($message, 0, 1000);
 $receiver = substr($receiver, 0, 15);
 if (strlen($message) > 10) $summary = substr($message, 0, 9) . '...';
 else $summary = $message;
+if(!$sql->chatExistenceCheck($_SESSION['token']['username'], $receiver)) stdJqReturn(-3);
 $sql->messageSend($_SESSION['token']['username'], $receiver, $message);
 $sql->chatUpdate($_SESSION['token']['username'], $receiver, $summary);
 stdJqReturn(1);

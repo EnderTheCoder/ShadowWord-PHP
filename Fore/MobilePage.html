@@ -13,7 +13,6 @@
     <link rel="stylesheet" href="css/MobileStyle.css" type="text/css">
 </head>
 <body>
-
 <!--#Main是主界面-->
 <div id="Main">
     <div id="MainMessagesContainer">
@@ -69,7 +68,7 @@
         <form id="EditorTop">
             <label for="UserText"></label>
             <input name="UserText" id="UserText"/>
-            <button id="SubmitForText" type="button">发送</button>
+            <button id="SubmitForText" type="button" onclick="SubmitMessage()">发送</button>
         </form>
         <div id="EditorBottom">
 
@@ -79,7 +78,7 @@
 <script type="text/javascript">
     SwitchInitialize();
     PollListData();
-    if (JudgeDevice) window.location.href = "PCPage.html";
+
 </script>
 </body>
 </html>
