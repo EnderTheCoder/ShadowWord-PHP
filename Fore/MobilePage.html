@@ -24,24 +24,23 @@
         </div>
         <!--搜索框区域-->
         <div id="MainSearchBar">
-            <!--        <img id="SearchImg" src="img/search_%23A9A9A9.png">-->
             <!--搜索框中间的灰色区域-->
             <div id="MainSearchJump">搜索</div>
         </div>
         <!--消息列表container-->
         <div id="MainMessageList">
-        <!--模板消息框-->
-<!--            <div class="MessageBlock" onclick="JumpWindow('MessagesWindow')">-->
-<!--                <img src="img/TestHead.jpeg" alt="portrait" class="rounded-circle portrait">-->
-<!--                <div class="MessageLeft">-->
-<!--                    <div class="MessageTittle">天线宝宝</div>-->
-<!--                    <div class="MessageSummary">加油，奥利给！！！</div>-->
-<!--                </div>-->
-<!--                <div class="MessageRight">-->
-<!--                    <div class="MessageDate">下午22:10</div>-->
-<!--                    <div class="RedDot">99+</div>-->
-<!--                </div>-->
-<!--            </div>-->
+            <!--列表框模板-->
+            <!--            <div class="MessageBlock" onclick="JumpWindow('MessagesWindow')">-->
+            <!--                <img src="img/TestHead.jpeg" alt="portrait" class="rounded-circle portrait">-->
+            <!--                <div class="MessageLeft">-->
+            <!--                    <div class="MessageTittle">天线宝宝</div>-->
+            <!--                    <div class="MessageSummary">加油，奥利给！！！</div>-->
+            <!--                </div>-->
+            <!--                <div class="MessageRight">-->
+            <!--                    <div class="MessageDate">下午22:10</div>-->
+            <!--                    <div class="RedDot">99+</div>-->
+            <!--                </div>-->
+            <!--            </div>-->
             <!--空白占位框-->
             <div id="FixBlock">
             </div>
@@ -57,28 +56,36 @@
 <div id="MessagesWindow">
     <div id="MessagesTopBar">
         <img src="img/return_%23000000.png" alt="ReturnIcon" class="ReturnIcon" onclick="JumpWindow('Main')">
-        <div id="TopUserName">天线宝宝</div>
+        <div id="TopUserName"></div>
         <img src="img/search_%23000000.png" alt="SearchIcon" class="SearchIcon">
         <img src="img/friend_%23000000.png" alt="FriendIcon" class="FriendIcon">
     </div>
     <div id="MessagesArea">
-
+<!--        <div class="MessageTime">2020/01/06/20:35</div>-->
+<!--        <div class="Message">-->
+<!--            <div class="MessageTop">-->
+<!--                <div class="MessageName">EnderTheCoder</div>-->
+<!--            </div>-->
+<!--            <div class="MessageBottom">-->
+<!--                <div class="MessageContent">这是一条例行测试消息 这是一条例行测试消息 这是一条例行测试消息 这是一条例行测试消息 这是一条例行测试消息 这是一条例行测试消息 这是一条例行测试消息 这是一条例行测试消息 </div>-->
+<!--            </div>-->
+<!--        </div>-->
     </div>
     <div id="MessageEditor">
-        <form id="EditorTop">
+        <div id="EditorTop">
             <label for="UserText"></label>
             <input name="UserText" id="UserText"/>
             <button id="SubmitForText" type="button" onclick="SubmitMessage()">发送</button>
-        </form>
+        </div>
         <div id="EditorBottom">
-
+            功能区尚在开发中
         </div>
     </div>
 </div>
 <script type="text/javascript">
     SwitchInitialize();
     PollListData();
-
+    PollMessagesData();
 </script>
 </body>
 </html>

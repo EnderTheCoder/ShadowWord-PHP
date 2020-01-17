@@ -40,7 +40,7 @@
     /*margin-top: 20px;*/
     /*margin-bottom: 20px;*/
     position: absolute;
-    top:15px;
+    top: 15px;
     right: 15px;
 }
 
@@ -226,18 +226,71 @@
     overflow: auto;
 }
 
+.Message {
+    width: calc(100vw - 20px);
+    margin-left: 10px;
+    margin-right: 10px;
+    border-radius: 5px;
+}
+
+.MessageTop {
+    border-bottom: 1px solid #343a40;
+    height: 28px;
+    width: 100%;
+}
+
+.MessageName {
+    /*position: absolute;*/
+    padding-left: 3px;
+    width: 45%;
+    line-height: 25px;
+    font-size: 18px;
+}
+
+.MessageTime {
+    /*position: absolute;*/
+    /*right: 0;*/
+    color: #6c757d;
+    margin-right: 13px;
+    padding-right: 3px;
+    font-size: 14px;
+    line-height: 28px;
+    text-align: center;
+    width: calc(100vw);
+}
+
+.MessageBottom {
+    padding-left: 3px;
+    padding-right: 3px;
+    font-size: medium;
+}
+
+.BlueMessage {
+    background-color: #007bff;
+}
+
+.OrangeMessage {
+    background-color: #fd7e14;
+}
+
+.MessageContent {
+    width: 100%;
+    word-wrap:break-word;
+}
+
 #MessageEditor {
     height: 80px;
     width: calc(100vw);
-    position: absolute;
-    bottom: 0;
+    /*position: absolute;*/
+    /*bottom: 0;*/
+    margin-bottom: 0;
     background-color: #FAFAFA;
 }
 
 #EditorTop {
     height: 40px;
     width: calc(100vw);
-    border-bottom:#A9A9A9 solid 1px;
+    border-bottom: #A9A9A9 solid 1px;
 }
 
 #UserText {

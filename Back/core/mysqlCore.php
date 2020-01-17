@@ -103,10 +103,11 @@ class mysqlCore
         $stmt = $conn->prepare("UPDATE user_chats SET latestMessage = ? WHERE (user_1 = ? AND user_2 = ?) OR (user_1 = ? AND user_2 = ?)");
         $stmt->bind_param('sssss', $summary, $user_1, $user_2, $user_2, $user_1);
         $stmt->execute();
-        $conn = $this->mysqliConnect();
-        $stmt = $conn->prepare("UPDATE user_chats SET unread = unread + 1 WHERE user_1 = ? AND user_2 = ?");
-        $stmt->bind_param('ss', $user_2, $user_1);
-        $stmt->execute();
+//        $conn = $this->mysqliConnect();
+//        $stmt = $conn->prepare("UPDATE user_chats SET unread = unread + 1 WHERE user_1 = ? AND user_2 = ?");
+//        $stmt->bind_param('ss', $user_2, $user_1);
+//        $stmt->execute();
+//        上方代码已经使用MySQL触发器代替
     }
 
     public function unreadUpdate($user_1, $user_2)
@@ -139,27 +140,30 @@ class mysqlCore
         return $result;
     }
 
-    public function messagesCheck($receiver, $sender)
+    public function messagesCheck($receiver, $sender, $lastMessageID)
     {
         $conn = $this->mysqliConnect();
         $id = '';
         $message = '';
-        $sentTime = '';
+        $sendTime = '';
         $state = '';
-        $rows = 0;
         $result = array();
-        $stmt = $conn->prepare("SELECT id, sender, message, sentTime, state FROM messages WHERE (receiver = ? AND sender = ?) OR (receiver = ? AND sender = ?)");
-        $stmt->bind_param('ssss', $receiver, $sender, $sender, $receiver);
+        $result['rows'] = 0;
+        $stmt = $conn->prepare("SELECT id, sender, message, sentTime, state FROM messages 
+        WHERE ((receiver = ? AND sender = ?) OR (receiver = ? AND sender = ?)) AND (id > ?)
+        ORDER BY id ASC LIMIT 100");
+        $stmt->bind_param('sssss', $receiver, $sender, $sender, $receiver, $lastMessageID);
         if (!$stmt->execute()) return false;
-        $stmt->bind_result($id, $sender, $message, $sentTime, $state);
+        $stmt->bind_result($id, $sender, $message, $sendTime, $state);
         $stmt->store_result();
         while ($stmt->fetch()) {
-            if (!$state) continue;
-            $result[$rows] = array(
+            $result['rows']++;
+//            if (!$state) continue;
+            $result[$result['rows']] = array(
                 'id' => $id,
                 'sender' => $sender,
                 'message' => $message,
-                'sentTime' => $sentTime,
+                'sendTime' => $sendTime,
                 'state' => $state,
             );
             /*
@@ -172,7 +176,6 @@ class mysqlCore
              * 2代表只有sender能看见；
              * 3代表只有receiver能看见
              * */
-            $rows++;
         }
         return $result;
     }
