@@ -125,7 +125,7 @@ function PollListData() {
 function PollMessagesData() {
     let FirstAvoid = false;
     const MessageBlockTemplate = '<div class="MessageTime">RP-Time</div>\n' +
-        '        <div class="Message RP-Color">\n' +
+        '        <div class="Message RP-Color" id="RP-ID">\n' +
         '            <div class="MessageTop">\n' +
         '                <div class="MessageName">RP-Name</div>\n' +
         '            </div>\n' +
@@ -174,6 +174,7 @@ function PollMessagesData() {
                 MessageBlock = MessageBlock.replace('RP-Color', color);
                 MessageBlock = MessageBlock.replace('RP-Name', NowChat['messages'][NowChat['messages']['total']]['sender']);
                 MessageBlock = MessageBlock.replace('RP-Content', NowChat['messages'][NowChat['messages']['total']]['content']);
+                MessageBlock = MessageBlock.replace('RP-ID', NowChat['messages'][NowChat['messages']['total']]['id']);
                 MessageArea.append(MessageBlock);
             }
             setTimeout("PollMessagesData()", 1000);
@@ -219,10 +220,10 @@ function SubmitMessage() {
                 JumpWindow('Main');
             }
             if (jsons === 1) {
-                NowChat['messages']['total']++;
-                NowChat['messages'][NowChat['messages']['total']] = [];
-                NowChat['messages'][NowChat['messages']['total']]['message'] = UserText.val();
-                NowChat['messages'][NowChat['messages']['total']]['type'] = 'send';
+                // NowChat['messages']['total']++;
+                // NowChat['messages'][NowChat['messages']['total']] = [];
+                // NowChat['messages'][NowChat['messages']['total']]['content'] = UserText.val();
+                // NowChat['messages'][NowChat['messages']['total']]['type'] = 'send';
             }
         },
         error: function () {

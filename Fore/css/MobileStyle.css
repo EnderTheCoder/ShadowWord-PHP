@@ -281,9 +281,9 @@
 #MessageEditor {
     height: 80px;
     width: calc(100vw);
-    /*position: absolute;*/
-    /*bottom: 0;*/
-    margin-bottom: 0;
+    position: absolute;
+    bottom: 0;
+    /*margin-bottom: 0;*/
     background-color: #FAFAFA;
 }
 

@@ -10,9 +10,9 @@ function GetQueryString(name) {
 
 /**
  * @return {boolean}
+ * PC返回true，PE返回false
  */
 function JudgeDevice() {
-    //PC返回true，PE返回false
     const userAgentInfo = navigator.userAgent;
     const Agents = ["Android", "iPhone", "SymbianOS", "Windows Phone", "iPad", "iPod"];
     let flag = true;
