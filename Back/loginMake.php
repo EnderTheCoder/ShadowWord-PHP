@@ -26,11 +26,10 @@ $user = $sql->getUserInfByUsername($username);
 if ($user['state'] == 3) stdJqReturn(-7);
 if ($user['state'] == 2) stdJqReturn(-6);
 if ($user['lvl'] < 2) stdJqReturn(-5);
-if ($user['username'] != $username|| $user['password'] != $password)
+if ($user['username'] != $username || $user['password'] != $password)
     stdJqReturn(-3);
 else {
-    if ($sql->updateLoginInf($username, $lastLoginIP, $lastLoginDate)) {
-        $token->tokenSpawn($username);
-        stdJqReturn(1);
-    } else stdJqReturn(-4);
+    $sql->updateLoginInf($username, $lastLoginIP, $lastLoginDate);
+    $token->tokenSpawn($username);
+    stdJqReturn(1);
 }

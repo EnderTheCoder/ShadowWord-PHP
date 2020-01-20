@@ -1,3 +1,6 @@
+$("button").click(function () {
+   login();
+});
 function login() {
     // $("#captcha-img").attr('src', '../Back/captcha.php');
     $.ajax({
