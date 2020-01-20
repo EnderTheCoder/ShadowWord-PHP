@@ -2,6 +2,7 @@
 //     $("#Main").css("z-index", "1000");
 // }
 
+//变量初始化
 let NowChat = [];
 NowChat['username'] = null;
 NowChat['messages'] = [];
@@ -9,30 +10,43 @@ NowChat['messages']['total'] = 0;
 NowChat['MaxID'] = 0;
 let NowWindow = "Main";
 
+//开始执行函数
+WindowInitialize();
+ClickInitialize();
+PollListData();
+PollMessagesData();
+
+//登录失效踢出
 function NotLoginKick() {
     alert("登录已经失效或不可用，请重新登录");
     window.location.href = "LoginPage.html";
 }
 
+//切换窗口
 function JumpWindow() {
     const Window = arguments[0];
     const Main = $("#Main");
     const MessagesWindow = $("#MessagesWindow");
     const TopUserName = $('#TopUserName');
+    const AddFriendWindow = $('#AddFriendWindow');
+    const UserInfWindow = $("#UserInfWindow");
+    NowWindow = Window;
     switch (Window) {
         case "Main":
             Main.show();
             MessagesWindow.hide();
-            NowWindow = "Main";
+            AddFriendWindow.hide();
+            UserInfWindow.hide();
             break;
         case "MessagesWindow":
-            NowWindow = "MessagesWindow";
             NowChat['username'] = arguments[1];
             NowChat['messages']['total'] = 0;
             if (NowChat['username'].length > 13) TopUserName.html(NowChat['username'].substr(0, 9) + '...');
             TopUserName.html(NowChat['username']);
             Main.hide();
+            AddFriendWindow.hide();
             MessagesWindow.show();
+            UserInfWindow.hide();
             $.ajax({
                 url: "../Back/unreadCheck.php",
                 type: "POST",
@@ -46,15 +60,86 @@ function JumpWindow() {
                 error: function () {
                 }
             });
+            break;
+        case "AddFriendWindow":
+            Main.hide();
+            MessagesWindow.hide();
+            AddFriendWindow.show();
+            UserInfWindow.hide();
+            break;
+        case "UserInfWindow":
+            Main.hide();
+            MessagesWindow.hide();
+            AddFriendWindow.hide();
+            UserInfWindow.show();
+            GetUserInf(arguments[1]);
+            break;
     }
 }
 
-function SwitchInitialize() {
+//初始化函数
+function WindowInitialize() {
+    //初始化内容遮盖关系
+    $("#Main").show();
     $("#MainSettingsContainer").hide();
     $("#MessagesWindow").hide();
+    $("#GrayMask").hide();
+    $("#AddBlock").hide();
+    $("#AddFriendWindow").hide();
+    $("#UserInfWindow").hide();
+}
+
+function ClickInitialize() {
+    //初始化点击触发器
+    $("#SubmitForText").click(function () {
+        SubmitMessage();
+    });
+    $(".ReturnIcon").click(function () {
+        JumpWindow('Main');
+    });
+    $("#BottomMessages").click(function () {
+        SwitchIndex('Messages');
+    });
+    $("#BottomSettings").click(function () {
+        SwitchIndex('Settings');
+    });
+    $("#add").click(function () {
+        AddBlockControl("show");
+    });
+    $("#GrayMask").click(function () {
+        AddBlockControl("hide");
+    });
+    $("#AddFriend").click(function () {
+        JumpWindow("AddFriendWindow");
+        AddBlockControl("hide")
+    });
+    $("#FriendSearchSubmit").click(function () {
+        SearchFriends();
+    });
+    $("#UserInfReturn").click(function () {
+        JumpWindow("AddFriendWindow");
+    });
     // $("#Main").hide();
 }
 
+function AddBlockControl(action) {
+    const Main = $("#Main");
+    if (action === "show") {
+        $("#GrayMask").show();
+        $("#AddBlock").show();
+        Main.css("filter", "alpha(Opacity=80)");
+        Main.css("-moz-opacity", "0.5");
+        Main.css("opacity", "0.5");
+    } else {
+        $("#GrayMask").hide();
+        $("#AddBlock").hide();
+        Main.css("filter", "");
+        Main.css("-moz-opacity", "");
+        Main.css("opacity", "");
+    }
+}
+
+//控制主页下方选项卡的切换
 function SwitchIndex(Page) {
     const Messages = $("#MainMessagesContainer");
     const Settings = $("#MainSettingsContainer");
@@ -76,6 +161,7 @@ function SwitchIndex(Page) {
     }
 }
 
+//轮询列表信息
 function PollListData() {
     const MessageList = $("#MainMessageList");
     const MessageEnd = '<div id="FixBlock"></div>';
@@ -122,6 +208,7 @@ function PollListData() {
     })
 }
 
+//轮询消息数据
 function PollMessagesData() {
     let FirstAvoid = false;
     const MessageBlockTemplate = '<div class="MessageTime">RP-Time</div>\n' +
@@ -199,6 +286,7 @@ function PollMessagesData() {
         });
 }
 
+//发送消息
 function SubmitMessage() {
     const UserText = $('#UserText');
     if (UserText.val() === '') return;
@@ -234,4 +322,92 @@ function SubmitMessage() {
     if (UserText.val().length > 33) summary = UserText.val().substr(0, 30) + '...';
     $('#' + NowChat['username'] + ' .MessageSummary').html(summary);
     UserText.val('');
+}
+
+function SearchFriends() {
+    const template = '<div class="MessageBlock" onclick="JumpWindow(\'UserInfWindow\',\'RP-Username\')">\n' +
+        '                <img src="img/TestHead.jpeg" alt="portrait" class="rounded-circle portrait">\n' +
+        '                <div class="MessageLeft">\n' +
+        '                    <div class="MessageTittle">RP-Username</div>\n' +
+        '                    <div class="MessageSummary">RP-Email</div>\n' +
+        '                </div>\n' +
+        '                <div class="MessageRight">\n' +
+        '                    <img class="AddFriendIcon" src="img/add_%231296DB.png" alt="AddIcon">\n' +
+        '                </div>\n' +
+        '            </div>';
+    const FriendSearchInput = $("#FriendSearchInput");
+    const FriendListArea = $("#FriendListArea");
+    if (FriendSearchInput.val() === '') return;
+    $.ajax({
+        url: "../Back/searchFriends.php",
+        type: "POST",
+        dataType: 'jsonp',
+        async: true,
+        timeout: 5000,
+        data: {
+            'input': FriendSearchInput.val(),
+        },
+        success: function (result) {
+            FriendListArea.empty();
+            const jsons = eval(result);
+            if (jsons === -1) NotLoginKick();
+            for (let i = 1; i <= jsons['rows']; i++) {
+                if (jsons[i] === null) continue;
+                let output = template.replace("RP-Username", jsons[i]['username']);
+                output = output.replace("RP-Username", jsons[i]['username']);
+                output = output.replace("RP-Email", jsons[i]['email']);
+                FriendListArea.append(output);
+            }
+        },
+        error: function () {
+
+        }
+    });
+}
+
+function GetUserInf(username) {
+    const template = "<div class=\"Inf-List-Item\">\n" +
+        "            <div class=\"Inf-Item-Top\">RP-Top</div>\n" +
+        "            <div class=\"Inf-Item-Bottom\">RP-Bottom</div>\n" +
+        "        </div>";
+    const button = "<div id=\"Add-Friend-Button\" onclick='JumpWindow(\"SendRequestWindow\",\"RP-Username\")'>添加好友</div>";
+    const area = $("#UserInfList");
+    $.ajax({
+        url: "../Back/getUserInf.php",
+        type: "POST",
+        dataType: 'jsonp',
+        async: true,
+        timeout: 5000,
+        data: {
+            'username': username,
+        },
+        success: function (result) {
+            area.empty();
+            const jsons = eval(result);
+            if (jsons === -1) NotLoginKick();
+            let block = template.replace('RP-Top', '用户名');
+            block = block.replace('RP-Bottom', jsons['username']);
+            area.append(block);
+            block = template.replace("RP-Top", "等级");
+            block = block.replace('RP-Bottom', 'lvl-' + jsons['lvl']);
+            area.append(block);
+            block = template.replace("RP-Top", "邮箱");
+            block = block.replace('RP-Bottom', jsons['email']);
+            area.append(block);
+            if (jsons['site'] != null) {
+                block = template.replace("RP-Top", "个人网站");
+                block = block.replace('RP-Bottom', jsons['site']);
+                area.append(block);
+            }
+            block = button.replace("RP-Username", jsons['username']);
+            area.append(block);
+        },
+        error: function () {
+
+        }
+    });
+}
+
+function AddFriend(username) {
+
 }

@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!DOCTYPE HTML>
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
@@ -8,7 +8,6 @@
     <script src="js/jquery-3.4.1.js" type="text/javascript"></script>
     <script src="js/bootstrap.min.js" type="text/javascript"></script>
     <script src="js/CustomFunctions.js" type="text/javascript"></script>
-    <script src="js/MobileControl.js" type="text/javascript"></script>
     <link type="text/css" rel="stylesheet" href="css/bootstrap.min.css">
     <link rel="stylesheet" href="css/MobileStyle.css" type="text/css">
 </head>
@@ -21,12 +20,6 @@
             <img id="contacts" src="img/contacts_%23FFFFFF.png" alt="ContactsIcon">
             <div id="TopBarCenterText">消息</div>
             <img id="add" src="img/add_%23FFFFFF.png" alt="AddIcon">
-            <div id="AddBlock">
-                <div id="CreateTemUser"></div>
-                <div id="AddFriend"></div>
-                <div id="CreateGroupChat"></div>
-                <div id="UploadFile"></div>
-            </div>
         </div>
         <!--搜索框区域-->
         <div id="MainSearchBar">
@@ -55,43 +48,96 @@
     </div>
     <div id="MainSettingsContainer"></div>
     <div id="MainBottomBar">
-        <img id="BottomMessages" src="img/messages_%231296DB.png" alt="MessagesIcon" onclick="SwitchIndex('Messages')"/>
-        <img id="BottomSettings" src="img/settings_%23A9A9A9.png" alt="SettingsIcon" onclick="SwitchIndex('Settings')"/>
+        <img id="BottomMessages" src="img/messages_%231296DB.png" alt="MessagesIcon"/>
+        <img id="BottomSettings" src="img/settings_%23A9A9A9.png" alt="SettingsIcon"/>
     </div>
 </div>
 <div id="MessagesWindow">
     <div id="MessagesTopBar">
-        <img src="img/return_%23000000.png" alt="ReturnIcon" class="ReturnIcon" onclick="JumpWindow('Main')">
+        <img src="img/return_%23000000.png" alt="ReturnIcon" class="ReturnIcon">
         <div id="TopUserName"></div>
         <img src="img/search_%23000000.png" alt="SearchIcon" class="SearchIcon">
         <img src="img/friend_%23000000.png" alt="FriendIcon" class="FriendIcon">
     </div>
     <div id="MessagesArea">
-<!--        <div class="MessageTime">2020/01/06/20:35</div>-->
-<!--        <div class="Message">-->
-<!--            <div class="MessageTop">-->
-<!--                <div class="MessageName">EnderTheCoder</div>-->
-<!--            </div>-->
-<!--            <div class="MessageBottom">-->
-<!--                <div class="MessageContent">这是一条例行测试消息</div>-->
-<!--            </div>-->
-<!--        </div>-->
+        <!--        <div class="MessageTime">2020/01/06/20:35</div>-->
+        <!--        <div class="Message">-->
+        <!--            <div class="MessageTop">-->
+        <!--                <div class="MessageName">EnderTheCoder</div>-->
+        <!--            </div>-->
+        <!--            <div class="MessageBottom">-->
+        <!--                <div class="MessageContent">这是一条例行测试消息</div>-->
+        <!--            </div>-->
+        <!--        </div>-->
     </div>
     <div id="MessageEditor">
         <div id="EditorTop">
             <label for="UserText"></label>
             <input name="UserText" id="UserText"/>
-            <button id="SubmitForText" type="button" onclick="SubmitMessage()">发送</button>
+            <button id="SubmitForText" type="button">发送</button>
         </div>
         <div id="EditorBottom">
             功能区尚在开发中
         </div>
     </div>
 </div>
-<script type="text/javascript">
-    SwitchInitialize();
-    PollListData();
-    PollMessagesData();
-</script>
+<div id="AddFriendWindow">
+    <div id="AddFriendTopBar">
+        <img src="img/return_%23000000.png" alt="ReturnIcon" class="ReturnIcon">
+        <div id="AddFriendText">添加</div>
+    </div>
+    <div id="AddFriendBottom">
+        <div id="FriendSearchBar">
+            <label for="FriendSearchInput"></label>
+            <input id="FriendSearchInput" placeholder="查找ShadoWords账号/邮箱/群"/>
+            <button id="FriendSearchSubmit" type="button">查找</button>
+        </div>
+        <div id="FriendListArea">
+            <!--            <div class="MessageBlock">-->
+            <!--                <img src="img/TestHead.jpeg" alt="portrait" class="rounded-circle portrait">-->
+            <!--                <div class="MessageLeft">-->
+            <!--                    <div class="MessageTittle">EnderTheCoder</div>-->
+            <!--                    <div class="MessageSummary">f1991455223@sina.com</div>-->
+            <!--                </div>-->
+            <!--                <div class="MessageRight">-->
+            <!--                    <img class="AddFriendIcon" src="img/add_%231296DB.png" alt="AddIcon">-->
+            <!--                </div>-->
+            <!--            </div>-->
+        </div>
+    </div>
+</div>
+<div id="UserInfWindow">
+    <div id="UserTopImage">
+        <img src="img/TestHead.jpeg" alt="User-Portrait" id="Large-Portrait"/>
+        <img src="img/return_%23FFFFFF.png" alt="Return-Button" id="UserInfReturn">
+    </div>
+    <div id="UserInfList">
+<!--        <div class="Inf-List-Item">-->
+<!--            <div class="Inf-Item-Top">用户名</div>-->
+<!--            <div class="Inf-Item-Bottom">EnderTheCoder</div>-->
+<!--        </div>-->
+<!--        <div class="Inf-List-Item">-->
+<!--            <div class="Inf-Item-Top">用户等级</div>-->
+<!--            <div class="Inf-Item-Bottom">lvl-5 站长</div>-->
+<!--        </div>-->
+<!--        <div class="Inf-List-Item">-->
+<!--            <div class="Inf-Item-Top">邮箱</div>-->
+<!--            <div class="Inf-Item-Bottom">1991455223@qq.com</div>-->
+<!--        </div>-->
+<!--        <div class="Inf-List-Item">-->
+<!--            <div class="Inf-Item-Top">个人网站</div>-->
+<!--            <div class="Inf-Item-Bottom">http://ender.yishugou.shop/</div>-->
+<!--        </div>-->
+<!--        <div id="Add-Friend-Button">添加好友</div>-->
+    </div>
+</div>
+<div id="GrayMask"></div>
+<div id="AddBlock">
+    <div id="AddFriend">加好友</div>
+    <div id="CreateTemUser">创建临时用户</div>
+    <div id="CreateGroupChat">创建群聊</div>
+    <div id="UploadFile">上传文件</div>
+</div>
+<script type="text/javascript" src="js/MobileControl.js"></script>
 </body>
 </html>

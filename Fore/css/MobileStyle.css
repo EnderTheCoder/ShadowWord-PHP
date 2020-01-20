@@ -44,6 +44,10 @@
     right: 15px;
 }
 
+#AddBlock div:hover {
+    background-color: #EDEFEE;
+}
+
 #MainSearchBar {
     width: calc(100vw);
     height: 40px;
@@ -275,7 +279,7 @@
 
 .MessageContent {
     width: 100%;
-    word-wrap:break-word;
+    word-wrap: break-word;
 }
 
 #MessageEditor {
@@ -306,11 +310,153 @@
 #SubmitForText {
     border: none;
     background-color: #FAFAFA;
-    height: 39px;
+    height: 40px;
     width: 80px;
     text-align: center;
     color: #0689F9;
     position: absolute;
     right: 0;
     font-size: 18px;
+}
+
+#GrayMask {
+    filter: alpha(Opacity=80);
+    -moz-opacity: 0.5;
+    opacity: 0.5;
+    height: calc(100vh);
+    width: calc(100vw);
+    position: fixed;
+    z-index: 1;
+}
+
+#AddBlock {
+    position: fixed;
+    top: 60px;
+    right: 0;
+    width: calc(50vw);
+    height: calc(20vh);
+    background-color: white;
+    z-index: 5;
+}
+
+#AddBlock div {
+    width: 100%;
+    height: 25%;
+    line-height: calc(5vh);
+    text-align: center;
+}
+
+#AddFriendTopBar {
+    height: 60px;
+    width: calc(100vw);
+    background-color: #F5F6F8;
+}
+
+#AddFriendText {
+    line-height: 30px;
+    position: absolute;
+    top: 15px;
+    left: 60px;
+    text-align: center;
+    font-size: 24px;
+    width: calc(100vw - 120px);
+}
+
+#AddFriendBottom {
+    background-color: #F5F6F8;
+}
+
+#FriendSearchInput {
+    border: none;
+    height: 40px;
+    background-color: #FFFFFF;
+    width: calc(100vw - 81px);
+    margin-left: 0;
+}
+
+#FriendSearchSubmit {
+    border: none;
+    background-color: #FFFFFF;
+    height: 40px;
+    width: 80px;
+    text-align: center;
+    color: #0689F9;
+    position: absolute;
+    top: 60px;
+    right: 0;
+    font-size: 18px;
+}
+
+#FriendListArea {
+    overflow: auto;
+    height: calc(100vh - 100px);
+    width: calc(100vw);
+}
+
+.AddFriendIcon {
+    width: 60%;
+    margin: 12px;
+}
+
+#UserInfWindow {
+    width: calc(100vw);
+    height: calc(100vh);
+}
+
+#Large-Portrait {
+    width: calc(100vw);
+}
+
+#UserInfReturn {
+    height: 30px;
+    width: 30px;
+    position: absolute;
+    top: 15px;
+    left: 15px;
+}
+
+#UserInfList {
+    position: absolute;
+    bottom: 0;
+    height: calc(100vh - 80vw);
+    width: calc(100vw);
+    background-color: #F5F6F8;
+}
+
+.Inf-List-Item {
+    width: calc(100vw);
+    height: 60px;
+    background-color: #FFFFFF;
+    border-bottom: #CCCCCC 1px solid;
+    padding-left: 5px;
+}
+
+.Inf-Item-Top {
+    color: #6c757d;
+    font-size: 15px;
+    line-height: 30px;
+    height: 25px;
+    width: 100%;
+    margin-top: 5px;
+}
+
+.Inf-Item-Bottom {
+    font-size: 20px;
+    line-height: 30px;
+    height: 25px;
+    width: 100%;
+    margin-bottom: 5px;
+}
+
+#Add-Friend-Button {
+    background-color: #007bff;
+    height: 60px;
+    width: 100%;
+    position: absolute;
+    bottom: 0;
+    line-height: 60px;
+    text-align: center;
+    font-size: large;
+    color: white;
+    font-weight: bold;
 }

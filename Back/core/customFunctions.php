@@ -1,12 +1,14 @@
 <?php
-function emptyCheck($str) {
+function emptyCheck($str)
+{
     return (!empty($str) && isset($str));
 }
 
-function stdJqReturn($res) {
-    if(emptyCheck($_GET['callback'])) $callback = $_GET['callback'];
+function stdJqReturn($res)
+{
+    if (emptyCheck($_GET['callback'])) $callback = $_GET['callback'];
     else $callback = $_POST['callback'];
-    echo $callback.'('.json_encode($res).')';
+    echo $callback . '(' . json_encode($res) . ')';
     exit;
 }
 
@@ -32,5 +34,12 @@ function keySpawn()
     $Key = $randStr . time();
     $Key = base64_encode($Key);
     return $Key;
+}
+
+function sqlInjectionFilter($str, $length)
+{
+    $str = addslashes(sprintf("%s", $str));
+    $str = substr($str,0, $length - 1);
+    return $str;
 }
 

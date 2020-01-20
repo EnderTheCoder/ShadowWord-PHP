@@ -1,2 +1,2 @@
 <?php
-define("URL", "http://localhost:8888/", true);
+define("URL", "http://frp.yishugou.shop:4002/", true);

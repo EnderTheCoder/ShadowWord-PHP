@@ -13,12 +13,22 @@ class mysqlCore
         return $conn;
     }
 
+    private function PDO_MYSQL_CONNECT()
+    {
+        $host = MYSQL_HOST;
+        $dbName = MYSQL_DB_NAME;
+        $dsn="mysql:host=$host;dbname=$dbName";
+        $dbh = new PDO($dsn, MYSQL_USER_NAME, MYSQL_PASSWORD);
+        return $dbh;
+    }
+
     public function registerCheck($username, $password, $regDate, $email, $regIP, $state)
     {
         $conn = $this->mysqliConnect();
         $stmt = $conn->prepare("INSERT INTO userInf (username, password, regDate, email, regIP, state) VALUES (?, ?, ?, ?, ?, ?)");
         $stmt->bind_param('ssssss', $username, $password, $regDate, $email, $regIP, $state);
         $stmt->execute();
+        $conn->close();
         /*
          * 用户状态state
          * 1:正常用户
@@ -32,7 +42,8 @@ class mysqlCore
         $conn = $this->mysqliConnect();
         $stmt = $conn->prepare("UPDATE userInf SET lastLoginIP = ?, lastLoginDate = ? WHERE username = ?");
         $stmt->bind_param('sss', $lastLoginIP, $lastLoginDate, $username);
-        return $stmt->execute();
+        $stmt->execute();
+        $conn->close();
     }
 
     public function tokenSave($username, $tokenValue, $timeNow, $exp)
@@ -42,12 +53,13 @@ class mysqlCore
         if ($checkout['tokenValue']) {
             $stmt = $conn->prepare("UPDATE token SET tokenValue = ?, timeNow = ?, exp = ? WHERE username = ?");
             $stmt->bind_param('ssss', $tokenValue, $timeNow, $exp, $username);
-            return $stmt->execute();
+            $stmt->execute();
         } else {
             $stmt = $conn->prepare("INSERT INTO token (username, timeNow, tokenValue, exp) VALUES (?, ?, ?, ?)");
             $stmt->bind_param('ssss', $username, $timeNow, $tokenValue, $exp);
-            return $stmt->execute();
+            $stmt->execute();
         }
+        $conn->close();
     }
 
     public function tokenGet($username)
@@ -63,6 +75,7 @@ class mysqlCore
         $stmt->bind_result($result['timeNow'], $result['exp'], $result['tokenValue']);
         $stmt->execute();
         $stmt->fetch();
+        $conn->close();
         return $result;
     }
 
@@ -74,7 +87,8 @@ class mysqlCore
 //     $stmt->execute();
         $stmt = $conn->prepare("UPDATE token SET tokenValue = ?, timeNow = ?, exp = 3600 WHERE username = ?");
         $stmt->bind_param('sss', $tokenValue, time(), $username);
-        return $stmt->execute();
+        $stmt->execute();
+        $conn->close();
     }
 
     public function chatExistenceCheck($sender, $receiver)
@@ -86,6 +100,7 @@ class mysqlCore
         $stmt->bind_result($result);
         $stmt->execute();
         $stmt->fetch();
+        $conn->close();
         return boolval($result != '');
     }
 
@@ -94,7 +109,8 @@ class mysqlCore
         $conn = $this->mysqliConnect();
         $stmt = $conn->prepare("INSERT INTO messages(sender, receiver, message, sentTime) VALUES (?, ?, ?, ?)");
         $stmt->bind_param('ssss', $sender, $receiver, $message, time());
-        return $stmt->execute();
+        $stmt->execute();
+        $conn->close();
     }
 
     public function chatUpdate($user_1, $user_2, $summary)//user_1 send to user_2
@@ -103,6 +119,7 @@ class mysqlCore
         $stmt = $conn->prepare("UPDATE user_chats SET latestMessage = ? WHERE (user_1 = ? AND user_2 = ?) OR (user_1 = ? AND user_2 = ?)");
         $stmt->bind_param('sssss', $summary, $user_1, $user_2, $user_2, $user_1);
         $stmt->execute();
+        $conn->close();
 //        $conn = $this->mysqliConnect();
 //        $stmt = $conn->prepare("UPDATE user_chats SET unread = unread + 1 WHERE user_1 = ? AND user_2 = ?");
 //        $stmt->bind_param('ss', $user_2, $user_1);
@@ -116,6 +133,7 @@ class mysqlCore
         $stmt = $conn->prepare("UPDATE user_chats SET unread = 0 WHERE user_1 = ? AND user_2 = ?");
         $stmt->bind_param('ss', $user_1, $user_2);
         $stmt->execute();
+        $conn->close();
     }
 
     public function unreadCheck($username)
@@ -137,6 +155,7 @@ class mysqlCore
             );
             $rows++;
         }
+        $conn->close();
         return $result;
     }
 
@@ -177,6 +196,7 @@ class mysqlCore
              * 3代表只有receiver能看见
              * */
         }
+        $conn->close();
         return $result;
     }
 
@@ -205,6 +225,7 @@ class mysqlCore
                 'latestMessage' => $latestMessage,
             );
         }
+        $conn->close();
         return $result;
     }
 
@@ -216,7 +237,8 @@ class mysqlCore
         $stmt->execute();
         $stmt = $conn->prepare("INSERT INTO userInf (username, password, regDate, lvl, master, state) VALUES (?, ?, ?, ?, ?, 1)");
         $stmt->bind_param('sssss', $username, $password, date("Y/m/d"), $lvl, $master);
-        return $stmt->execute();
+        $stmt->execute();
+        $conn->close();
     }
 
     public function getTemUsersByUsername($username)
@@ -228,13 +250,16 @@ class mysqlCore
         $stmt->bind_result($temUsers);
         $stmt->execute();
         $stmt->fetch();
+        $conn->close();
         return $temUsers;
     }
 
     public function getUserInfByUsername($username)
     {
         $conn = $this->mysqliConnect();
-        $stmt = $conn->prepare("SELECT id, username, lvl, views, email, regDate, regIP, lastloginIP, lastloginDate, info, password, temUsers, master, state FROM userInf where username = ?");
+        $stmt = $conn->prepare("SELECT id, username, lvl, views, email, regDate, 
+        regIP, lastloginIP, lastloginDate, info, password, temUsers, master, state, site 
+        FROM userInf where username = ?");
         $stmt->bind_param('s', $username);
         $result = array();
         $stmt->bind_result(
@@ -251,10 +276,12 @@ class mysqlCore
             $result['password'],
             $result['temUsers'],
             $result['master'],
-            $result['state']
+            $result['state'],
+            $result['site']
         );
         $stmt->execute();
         $stmt->fetch();
+        $conn->close();
         return $result;
     }
 
@@ -266,6 +293,7 @@ class mysqlCore
         $stmt->execute();
         $stmt->bind_param('ss', $user_2, $user_1);
         $stmt->execute();
+        $conn->close();
     }
 
     public function userDestroy($username)
@@ -274,6 +302,7 @@ class mysqlCore
         $stmt = $conn->prepare("DELETE FROM userInf WHERE username = ?");
         $stmt->bind_param('s', $username);
         $stmt->execute();
+        $conn->close();
     }
 
     public function requestChat($user_1, $user_2)
@@ -282,6 +311,7 @@ class mysqlCore
         $stmt = $conn->prepare("INSERT INTO requestsQuery(sender, receiver) VALUES (?, ?)");
         $stmt->bind_param('ss', $user_1, $user_2);
         $stmt->execute();
+        $conn->close();
     }
 
     public function saveEmailKey($key, $action, $username)
@@ -296,6 +326,7 @@ class mysqlCore
         $stmt = $conn->prepare("INSERT INTO emailKey(keyValue, `action`, username) VALUES (?, ?, ?)");
         $stmt->bind_param('sss', $key, $action, $username);
         $stmt->execute();
+        $conn->close();
     }
 
     public function getEmailKey($key)
@@ -315,6 +346,7 @@ class mysqlCore
         $stmt = $conn->prepare("DELETE FROM `emailKey` WHERE `keyValue` = ?");
         $stmt->bind_param('s', $key);
         $stmt->execute();
+        $conn->close();
         return $result;
     }
 
@@ -324,6 +356,29 @@ class mysqlCore
         $stmt = $conn->prepare("UPDATE `userInf` SET `state` = 1 WHERE `username` = ?");
         $stmt->bind_param('s', $username);
         $stmt->execute();
+        $conn->close();
+    }
+
+    public function searchFriends($target)
+    {
+        $target = sqlInjectionFilter($target, 15);
+        $username = null;
+        $email = null;
+        $result = array();
+        $result['rows'] = 0;
+        $sql = "SELECT username, email FROM userInf WHERE username LIKE '%$target%'";
+        $conn = $this->mysqliConnect();
+        $stmt = $conn->prepare($sql);
+        $stmt->bind_result($username, $email);
+        $stmt->execute();
+        while ($stmt->fetch())
+        {
+            $result['rows']++;
+            $result[$result['rows']]['username'] = $username;
+            $result[$result['rows']]['email'] = $email;
+        }
+        $conn->close();
+        return $result;
     }
 }
 //插入新消息会增加回话的未读消息数触发器
