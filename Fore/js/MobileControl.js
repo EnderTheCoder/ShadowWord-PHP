@@ -8,13 +8,18 @@ NowChat['username'] = null;
 NowChat['messages'] = [];
 NowChat['messages']['total'] = 0;
 NowChat['MaxID'] = 0;
-let NowWindow = "Main";
+NowChat['UsrTmp'] = null;
+let WindowStack = [];
+let WindowStack_Pointer = 0;
+WindowStack[0] = "Main";
+let AddFocus = null;
 
 //开始执行函数
 WindowInitialize();
 ClickInitialize();
 PollListData();
 PollMessagesData();
+GetRequestsList();
 
 //登录失效踢出
 function NotLoginKick() {
@@ -25,28 +30,23 @@ function NotLoginKick() {
 //切换窗口
 function JumpWindow() {
     const Window = arguments[0];
-    const Main = $("#Main");
-    const MessagesWindow = $("#MessagesWindow");
     const TopUserName = $('#TopUserName');
-    const AddFriendWindow = $('#AddFriendWindow');
-    const UserInfWindow = $("#UserInfWindow");
-    NowWindow = Window;
+    WindowStack_Pointer++;
+    WindowStack[WindowStack_Pointer] = Window;
+    WindowControl(Window);
     switch (Window) {
         case "Main":
-            Main.show();
-            MessagesWindow.hide();
-            AddFriendWindow.hide();
-            UserInfWindow.hide();
             break;
         case "MessagesWindow":
+            if (arguments[1] === "验证消息") {
+                WindowStack[WindowStack_Pointer] = "RequestsListWindow";
+                WindowControl("RequestsListWindow");
+                break;
+            }
             NowChat['username'] = arguments[1];
             NowChat['messages']['total'] = 0;
             if (NowChat['username'].length > 13) TopUserName.html(NowChat['username'].substr(0, 9) + '...');
             TopUserName.html(NowChat['username']);
-            Main.hide();
-            AddFriendWindow.hide();
-            MessagesWindow.show();
-            UserInfWindow.hide();
             $.ajax({
                 url: "../Back/unreadCheck.php",
                 type: "POST",
@@ -62,19 +62,41 @@ function JumpWindow() {
             });
             break;
         case "AddFriendWindow":
-            Main.hide();
-            MessagesWindow.hide();
-            AddFriendWindow.show();
-            UserInfWindow.hide();
             break;
         case "UserInfWindow":
-            Main.hide();
-            MessagesWindow.hide();
-            AddFriendWindow.hide();
-            UserInfWindow.show();
             GetUserInf(arguments[1]);
             break;
+        case "SendRequestWindow":
+            AddFocus = arguments[1];
+            $("#SendRequestWindow textarea").empty();
+            break;
+        case "AddSuccessWindow":
+            break;
+        case "RequestsListWindow":
+            GetRequestsList();
+            break;
     }
+}
+
+function WindowControl(target) {
+    const total = 7;
+    let Window = [];
+    Window[0] = "Main";
+    Window[1] = "MessagesWindow";
+    Window[2] = "AddFriendWindow";
+    Window[3] = "UserInfWindow";
+    Window[4] = "SendRequestWindow";
+    Window[5] = "AddSuccessWindow";
+    Window[6] = "RequestsListWindow";
+    for (let i = 0; i < total; i++) {
+        if (Window[i] !== target) $("#" + Window[i]).hide();
+        else $("#" + Window[i]).show();
+    }
+}
+
+function Back() {
+    $("#" + WindowStack[WindowStack_Pointer]).hide();
+    $("#" + WindowStack[--WindowStack_Pointer]).show();
 }
 
 //初始化函数
@@ -87,6 +109,9 @@ function WindowInitialize() {
     $("#AddBlock").hide();
     $("#AddFriendWindow").hide();
     $("#UserInfWindow").hide();
+    $("#SendRequestWindow").hide();
+    $("#AddSuccessWindow").hide();
+    $("#RequestsListWindow").hide();
 }
 
 function ClickInitialize() {
@@ -95,7 +120,7 @@ function ClickInitialize() {
         SubmitMessage();
     });
     $(".ReturnIcon").click(function () {
-        JumpWindow('Main');
+        Back();
     });
     $("#BottomMessages").click(function () {
         SwitchIndex('Messages');
@@ -118,6 +143,13 @@ function ClickInitialize() {
     });
     $("#UserInfReturn").click(function () {
         JumpWindow("AddFriendWindow");
+    });
+    $("#AddSuccessWindow").click(function () {
+        Back();
+        Back();
+    });
+    $("#SendRequest").click(function () {
+        RequestToAddFriend();
     });
     // $("#Main").hide();
 }
@@ -187,6 +219,7 @@ function PollListData() {
             const jsons = eval(result);
             if (jsons === -1) NotLoginKick();
             for (let i = 1; i <= jsons['rows']; i++) {
+                if (jsons['messages'][i]['user_2'] === "验证消息" && jsons['messages'][i]['unread'] !== 0) GetRequestsList();
                 let MessageBlock = MessageBlockTemplate;
                 MessageBlock = MessageBlock.replace("RP-Tittle", jsons['messages'][i]['user_2']);
                 MessageBlock = MessageBlock.replace("RP-Summary", jsons['messages'][i]['latestMessage']);
@@ -237,9 +270,13 @@ function PollMessagesData() {
                 setTimeout("PollMessagesData()", 5000);
                 return;
             }
+            if (NowChat['username'] !== NowChat['UsrTmp']) {
+                MessageArea.empty();
+                NowChat['UsrTmp'] = NowChat['username'];
+            }
             const jsons = eval(result);
             if (jsons === -1) NotLoginKick();
-            if (jsons === -2 && FirstAvoid && NowWindow === "MessagesWindow") {
+            if (jsons === -2 && FirstAvoid && WindowStack[WindowStack_Pointer] === "MessagesWindow") {
                 alert("你与对方并非好友，会话将被关闭");
                 JumpWindow('Main');
             }
@@ -270,7 +307,7 @@ function PollMessagesData() {
             PollMessagesData();
         }
     });
-    if (NowWindow === "MessagesWindow")
+    if (WindowStack[WindowStack_Pointer] === "MessagesWindow")
         $.ajax({
             url: "../Back/unreadCheck.php",
             type: "POST",
@@ -303,7 +340,7 @@ function SubmitMessage() {
         success: function (result) {
             const jsons = eval(result);
             if (jsons === -1) NotLoginKick();
-            if (jsons === -2 && NowWindow === "MessagesWindow") {
+            if (jsons === -2 && WindowStack[WindowStack_Pointer] === "MessagesWindow") {
                 alert("你与对方并非好友，会话将被关闭");
                 JumpWindow('Main');
             }
@@ -324,7 +361,9 @@ function SubmitMessage() {
     UserText.val('');
 }
 
+//搜索用户列表
 function SearchFriends() {
+    //用户列表模板
     const template = '<div class="MessageBlock" onclick="JumpWindow(\'UserInfWindow\',\'RP-Username\')">\n' +
         '                <img src="img/TestHead.jpeg" alt="portrait" class="rounded-circle portrait">\n' +
         '                <div class="MessageLeft">\n' +
@@ -365,11 +404,14 @@ function SearchFriends() {
     });
 }
 
+//获取用户卡片信息
 function GetUserInf(username) {
+    //用户卡片信息模板
     const template = "<div class=\"Inf-List-Item\">\n" +
         "            <div class=\"Inf-Item-Top\">RP-Top</div>\n" +
         "            <div class=\"Inf-Item-Bottom\">RP-Bottom</div>\n" +
         "        </div>";
+    //添加好友按钮模板
     const button = "<div id=\"Add-Friend-Button\" onclick='JumpWindow(\"SendRequestWindow\",\"RP-Username\")'>添加好友</div>";
     const area = $("#UserInfList");
     $.ajax({
@@ -408,6 +450,115 @@ function GetUserInf(username) {
     });
 }
 
-function AddFriend(username) {
+//发送添加好友请求
+function RequestToAddFriend() {
+    const input = $("#SendRequestWindow textarea");
+    if (AddFocus === null) return;
+    $.ajax({
+        url: "../Back/requestChat.php",
+        type: "POST",
+        dataType: 'jsonp',
+        async: true,
+        timeout: 5000,
+        data: {
+            'username': AddFocus,
+            'requestMessage': input.val(),
+        },
+        success: function (result) {
+            const jsons = eval(result);
+            if (jsons === -1) NotLoginKick();
+            if (jsons === -2) {
+                alert("添加用户不满足条件");
+                return;
+            }
+            if (jsons === -3) {
+                alert("你与该用户已是好友");
+                return;
+            }
+            if (jsons === -4) {
+                alert("验证消息不可为空");
+                return;
+            }
+            if (jsons === -5) {
+                alert("你已经向该用户发送请求，请耐心等待对方通过请求");
+                return;
+            }
+            JumpWindow("AddSuccessWindow");
+        },
+        error: function () {
 
+        }
+    });
+}
+
+//获取验证消息列表
+function GetRequestsList() {
+    //验证申请模板
+    const template = '<div class="RequestBlock" id="Request-RP-Username">\n' +
+        '            <div class="RequestType">好友申请</div>\n' +
+        '            <div class="RequestContent">\n' +
+        '                <img src="img/TestHead.jpeg" class="portrait-70px rounded-circle" alt="portrait">\n' +
+        '                <div class="RequestRight">\n' +
+        '                    <div class="Requester">RP-Username</div>\n' +
+        '                    <br>\n' +
+        '                    <div class="RequestText">RP-Msg</div>\n' +
+        '                    <div class="AgreeArea">\n' +
+        '                        <button type="button" class="btn btn-outline-success AgreeButton" onclick="AgreeRequest(\'RP-Username\')">同意</button>\n' +
+        '                    </div>\n' +
+        '                </div>\n' +
+        '            </div>\n' +
+        '        </div>\n';
+    //活动区域
+    const Area = $("#RequestArea");
+    $.ajax({
+        url: "../Back/getRequestsList.php",
+        type: "POST",
+        dataType: 'jsonp',
+        async: true,
+        timeout: 5000,
+        success: function (result) {
+            Area.empty();
+            let jsons = eval(result);
+            if (jsons === -1) NotLoginKick();
+            for (let i = 0; i < jsons['rows']; i++) {
+                if (jsons[i]['requestMessage'].length > 24)
+                    jsons[i]['requestMessage'] = jsons[i]['requestMessage'].substr(0, 21) + '...';
+                let Block = template.replace("RP-Username", jsons[i]['sender']);
+                Block = Block.replace("RP-Username", jsons[i]['sender']);
+                Block = Block.replace("RP-Username", jsons[i]['sender']);
+                if (jsons[i]['requestMessage'] == null) Block = Block.replace("RP-Msg", '申请加为好友');
+                else Block = Block.replace("RP-Msg", jsons[i]['requestMessage']);
+                Area.append(Block);
+                if (jsons[i]['state'] === 1)
+                    $("#Request-" + jsons[i]['sender'] + " button").replaceWith('<div class="AgreedText">已同意</div>');
+                //<div class="AgreedText">已同意</div>
+            }
+        },
+        error: function () {
+
+        }
+    });
+}
+
+function AgreeRequest(username) {
+    $.ajax({
+        url: "../Back/AgreeRequest.php",
+        type: "POST",
+        dataType: 'jsonp',
+        async: true,
+        timeout: 5000,
+        data: {
+            'username': username,
+        },
+        success: function (result) {
+            let jsons = eval(result);
+            if (jsons === -1) NotLoginKick();
+            if (jsons === 1) {
+                $("#Request-" + username + " button").replaceWith('<div class="AgreedText">已同意</div>');
+            }
+        },
+        error: function () {
+
+        }
+    });
 }

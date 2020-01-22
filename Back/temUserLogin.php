@@ -10,5 +10,5 @@ if ($user['password']) {
     if ($_SESSION['captcha'] != $_POST['captcha']) stdJqReturn(-4);
     if ($user['password'] != $_POST['password']) stdJqReturn(-5);
 }
-$sql->createChat($_SESSION['token']['username'], $username);
+$sql->createChat($_SESSION['token']['username'], $username, 'temp', true);
 stdJqReturn(1);

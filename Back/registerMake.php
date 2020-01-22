@@ -35,6 +35,7 @@ $body = "点击链接即可完成验证<br/><a href='#'>%</a>";
 $body = str_replace("#", $returnURL, $body);
 $body = str_replace("%", $returnURL, $body);
 sendMailTo($mailTo, $title, $body);
+$sql->createChat($username, "验证消息", 'official', false);
 stdJqReturn(1);
 /*
  * 权限分为6级

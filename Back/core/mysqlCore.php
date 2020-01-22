@@ -17,7 +17,7 @@ class mysqlCore
     {
         $host = MYSQL_HOST;
         $dbName = MYSQL_DB_NAME;
-        $dsn="mysql:host=$host;dbname=$dbName";
+        $dsn = "mysql:host=$host;dbname=$dbName";
         $dbh = new PDO($dsn, MYSQL_USER_NAME, MYSQL_PASSWORD);
         return $dbh;
     }
@@ -82,11 +82,12 @@ class mysqlCore
     public function tokenUpdate($tokenValue, $username)
     {
         $conn = $this->mysqliConnect();
+        $time = time();
 //     $stmt = $conn->prepare("DELETE FROM TABLE token WHERE username = ?");
 //     $stmt->bind_param('s', $username);
 //     $stmt->execute();
         $stmt = $conn->prepare("UPDATE token SET tokenValue = ?, timeNow = ?, exp = 3600 WHERE username = ?");
-        $stmt->bind_param('sss', $tokenValue, time(), $username);
+        $stmt->bind_param('sss', $tokenValue, $time, $username);
         $stmt->execute();
         $conn->close();
     }
@@ -285,14 +286,16 @@ class mysqlCore
         return $result;
     }
 
-    public function createChat($user_1, $user_2)
+    public function createChat($user_1, $user_2, $type, $isDouble)
     {
         $conn = $this->mysqliConnect();
-        $stmt = $conn->prepare("INSERT INTO user_chats(user_1, user_2) VALUES (?, ?)");
-        $stmt->bind_param('ss', $user_1, $user_2);
+        $stmt = $conn->prepare("INSERT INTO user_chats(user_1, user_2, `type`, unread) VALUES (?, ?, ?, 0)");
+        $stmt->bind_param('sss', $user_1, $user_2, $type);
         $stmt->execute();
-        $stmt->bind_param('ss', $user_2, $user_1);
-        $stmt->execute();
+        if ($isDouble) {
+            $stmt->bind_param('sss', $user_2, $user_1, $type);
+            $stmt->execute();
+        }
         $conn->close();
     }
 
@@ -305,11 +308,11 @@ class mysqlCore
         $conn->close();
     }
 
-    public function requestChat($user_1, $user_2)
+    public function requestChat($user_1, $user_2, $requestMessage)
     {
         $conn = $this->mysqliConnect();
-        $stmt = $conn->prepare("INSERT INTO requestsQuery(sender, receiver) VALUES (?, ?)");
-        $stmt->bind_param('ss', $user_1, $user_2);
+        $stmt = $conn->prepare("INSERT INTO requestsQueue(sender, receiver, requestMessage) VALUES (?, ?, ?)");
+        $stmt->bind_param('sss', $user_1, $user_2, $requestMessage);
         $stmt->execute();
         $conn->close();
     }
@@ -339,7 +342,7 @@ class mysqlCore
             $result['keyValue'],
             $result['username'],
             $result['action']
-            );
+        );
         $stmt->execute();
         $stmt->fetch();
         $conn = $this->mysqliConnect();
@@ -359,26 +362,51 @@ class mysqlCore
         $conn->close();
     }
 
-    public function searchFriends($target)
+    public function searchFriends($target, $self)
     {
         $target = sqlInjectionFilter($target, 15);
         $username = null;
         $email = null;
         $result = array();
         $result['rows'] = 0;
-        $sql = "SELECT username, email FROM userInf WHERE username LIKE '%$target%'";
+        $sql = "SELECT username, email FROM userInf WHERE username LIKE '%$target%' AND lvl > 1 AND username != ? AND state = 1";
         $conn = $this->mysqliConnect();
         $stmt = $conn->prepare($sql);
+        $stmt->bind_param('s', $self);
         $stmt->bind_result($username, $email);
         $stmt->execute();
-        while ($stmt->fetch())
-        {
+        while ($stmt->fetch()) {
             $result['rows']++;
             $result[$result['rows']]['username'] = $username;
             $result[$result['rows']]['email'] = $email;
         }
         $conn->close();
         return $result;
+    }
+
+    public function getRequestsList($username)
+    {
+        $result = array();
+        $result['rows'] = 0;
+        $conn = $this->mysqliConnect();
+        $stmt = $conn->prepare("SELECT sender, requestMessage, state FROM requestsQueue WHERE receiver = ? ORDER BY id DESC LIMIT 100");
+        $stmt->bind_param('s', $username);
+        $stmt->bind_result($result[$result['rows']]['sender'],
+            $result[$result['rows']]['requestMessage'],
+            $result[$result['rows']]['state']);
+        $stmt->execute();
+        while ($stmt->fetch()) {
+            $result['rows']++;
+        }
+        return $result;
+    }
+
+    public function updateRequestState($sender, $receiver, $state)
+    {
+        $conn = $this->mysqliConnect();
+        $stmt = $conn->prepare("UPDATE requestsQueue SET state = ? WHERE sender = ? AND receiver = ?");
+        $stmt->bind_param('sss', $state, $sender, $receiver);
+        $stmt->execute();
     }
 }
 //插入新消息会增加回话的未读消息数触发器

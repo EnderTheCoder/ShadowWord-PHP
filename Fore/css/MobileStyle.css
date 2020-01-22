@@ -460,3 +460,154 @@
     color: white;
     font-weight: bold;
 }
+
+#SendRequestWindow {
+    width: calc(100vw);
+    height: calc(100vh);
+    background-color: #F5F6F8;
+}
+
+#SendRequestTopBar {
+    height: 60px;
+    width: calc(100vw);
+    background-color: #F5F6F8;
+}
+
+#IdentifyText {
+    line-height: 30px;
+    position: absolute;
+    top: 15px;
+    left: 60px;
+    text-align: center;
+    font-size: 24px;
+    width: calc(100vw - 120px);
+}
+
+#SendRequest {
+    height: 30px;
+    width: 30px;
+    position: absolute;
+    top: 15px;
+    right: 15px;
+}
+
+#SendRequestWindow textarea {
+    width: calc(100vw);
+    height: 200px;
+    border: none;
+}
+
+#AddSuccessWindow {
+    width: calc(100vw);
+    height: calc(100vh);
+    background-color: #F5F6F8;
+}
+
+#AddSuccessWindow img{
+    width: calc(100vw);
+}
+
+#AddSuccessWindow div{
+    width: calc(100vw);
+    line-height: 24px;
+    font-size: 24px;
+    text-align: center;
+}
+
+.CommonTopBar {
+    height: 60px;
+    width: calc(100vw);
+    background-color: #F5F6F8;
+}
+
+.CommonTopBarCenterText {
+    line-height: 30px;
+    position: absolute;
+    top: 15px;
+    left: 60px;
+    text-align: center;
+    font-size: 24px;
+    width: calc(100vw - 120px);
+}
+
+.CommonWindow {
+    width: calc(100vw);
+    height: calc(100vh);
+    background-color: #F5F6F8;
+}
+
+#RequestArea {
+    overflow: auto;
+    height: calc(100vh - 60px);
+    width: calc(100vw);
+}
+
+.RequestBlock {
+    height: 100px;
+    width: calc(100vw);
+    background-color: white;
+    position: relative;
+}
+
+.RequestType {
+    height: 15px;
+    width: calc(100vw);
+    line-height: 15px;
+    font-size: 10px;
+    color: #828282;
+    padding-left: 10px;
+}
+
+.RequestContent {
+    width: calc(100vw);
+    height: 80px;
+    position: relative;
+}
+
+.portrait-70px {
+    height: 70px;
+    width: 70px;
+    left: 10px;
+    top: 10px;
+    position: absolute;
+}
+
+.RequestRight {
+    width: calc(100vw - 90px);
+    height: 80px;
+    position: absolute;
+    right: 0;
+    bottom: 0;
+    margin-left: 10px;
+}
+
+.Requester {
+    display: inline-block;
+    height: 30px;
+    line-height: 30px;
+    margin-top: 10px;
+    font-size: large;
+}
+
+.RequestText {
+    display: inline-block;
+    height: 30px;
+    line-height: 30px;
+    margin-bottom: 10px;
+}
+
+.AgreeArea {
+    position: absolute;
+    height: 80px;
+    right: 0;
+    top: 0;
+    padding-top: 25px;
+    padding-right: 10px;
+}
+
+.AgreeButton {
+}
+
+.AgreedText {
+    color: #828282;
+}

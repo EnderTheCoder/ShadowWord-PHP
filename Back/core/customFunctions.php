@@ -39,7 +39,7 @@ function keySpawn()
 function sqlInjectionFilter($str, $length)
 {
     $str = addslashes(sprintf("%s", $str));
-    $str = substr($str,0, $length - 1);
+    $str = substr($str,0, $length);
     return $str;
 }
 
