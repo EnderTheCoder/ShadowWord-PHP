@@ -13,14 +13,14 @@ class mysqlCore
         return $conn;
     }
 
-    private function PDO_MYSQL_CONNECT()
-    {
-        $host = MYSQL_HOST;
-        $dbName = MYSQL_DB_NAME;
-        $dsn = "mysql:host=$host;dbname=$dbName";
-        $dbh = new PDO($dsn, MYSQL_USER_NAME, MYSQL_PASSWORD);
-        return $dbh;
-    }
+//    private function PDO_MYSQL_CONNECT()
+//    {
+//        $host = MYSQL_HOST;
+//        $dbName = MYSQL_DB_NAME;
+//        $dsn = "mysql:host=$host;dbname=$dbName";
+//        $dbh = new PDO($dsn, MYSQL_USER_NAME, MYSQL_PASSWORD);
+//        return $dbh;
+//    }
 
     public function registerCheck($username, $password, $regDate, $email, $regIP, $state)
     {
@@ -212,10 +212,11 @@ class mysqlCore
         $unread = 0;
         $user_2 = '';
         $latestMessage = '';
-        $stmt = $conn->prepare("SELECT unread, user_2, latestMessage FROM user_chats WHERE user_1 = ?");
+        $type = null;
+        $stmt = $conn->prepare("SELECT unread, user_2, latestMessage, `type` FROM user_chats WHERE user_1 = ?");
         $stmt->bind_param('s', $username);
         if (!$stmt->execute()) return false;
-        $stmt->bind_result($unread, $user_2, $latestMessage);
+        $stmt->bind_result($unread, $user_2, $latestMessage, $type);
         $stmt->store_result();
         while ($stmt->fetch()) {
             $result['rows']++;
@@ -224,6 +225,7 @@ class mysqlCore
                 'user_2' => $user_2,
                 'unread' => $unread,
                 'latestMessage' => $latestMessage,
+                'type' => $type,
             );
         }
         $conn->close();
@@ -387,16 +389,22 @@ class mysqlCore
     public function getRequestsList($username)
     {
         $result = array();
+        $sender = null;
+        $requestMessage = null;
+        $state = null;
         $result['rows'] = 0;
         $conn = $this->mysqliConnect();
         $stmt = $conn->prepare("SELECT sender, requestMessage, state FROM requestsQueue WHERE receiver = ? ORDER BY id DESC LIMIT 100");
         $stmt->bind_param('s', $username);
-        $stmt->bind_result($result[$result['rows']]['sender'],
-            $result[$result['rows']]['requestMessage'],
-            $result[$result['rows']]['state']);
+        $stmt->bind_result($sender, $requestMessage, $state);
         $stmt->execute();
         while ($stmt->fetch()) {
             $result['rows']++;
+            $result[$result['rows']] = array(
+                'sender' => $sender,
+                'requestMessage' => $requestMessage,
+                'state' => $state,
+            );
         }
         return $result;
     }

@@ -5,20 +5,19 @@
 //变量初始化
 let NowChat = [];
 NowChat['username'] = null;
-NowChat['messages'] = [];
-NowChat['messages']['total'] = 0;
-NowChat['MaxID'] = 0;
-NowChat['UsrTmp'] = null;
+NowChat['AppliedMessages'] = 0;
+// NowChat['messages'] = [];
+// NowChat['messages']['total'] = 0;
+// NowChat['MaxID'] = 0;
 let WindowStack = [];
 let WindowStack_Pointer = 0;
 WindowStack[0] = "Main";
 let AddFocus = null;
-
+// let InitializedMark = false;
 //开始执行函数
 WindowInitialize();
 ClickInitialize();
 PollListData();
-PollMessagesData();
 GetRequestsList();
 
 //登录失效踢出
@@ -43,23 +42,14 @@ function JumpWindow() {
                 WindowControl("RequestsListWindow");
                 break;
             }
-            NowChat['username'] = arguments[1];
-            NowChat['messages']['total'] = 0;
+            if (NowChat['username'] !== arguments[1]) {
+                NowChat['username'] = arguments[1];
+                NowChat['AppliedMessages'] = 0;
+            }
+            GetMessagesData(arguments[1]);
+            ApplyMessagesData(arguments[1]);
             if (NowChat['username'].length > 13) TopUserName.html(NowChat['username'].substr(0, 9) + '...');
             TopUserName.html(NowChat['username']);
-            $.ajax({
-                url: "../Back/unreadCheck.php",
-                type: "POST",
-                dataType: 'jsonp',
-                async: true,
-                timeout: 5000,
-                data: {'username': NowChat['username'],},
-                success: function (result) {
-                    if (result === -1) NotLoginKick();
-                },
-                error: function () {
-                }
-            });
             break;
         case "AddFriendWindow":
             break;
@@ -97,6 +87,22 @@ function WindowControl(target) {
 function Back() {
     $("#" + WindowStack[WindowStack_Pointer]).hide();
     $("#" + WindowStack[--WindowStack_Pointer]).show();
+}
+
+function ClearRedDot(username) {
+    $.ajax({
+        url: "../Back/unreadCheck.php",
+        type: "POST",
+        dataType: 'jsonp',
+        async: true,
+        timeout: 5000,
+        data: {'username': username,},
+        success: function (result) {
+            if (result === -1) NotLoginKick();
+        },
+        error: function () {
+        }
+    });
 }
 
 //初始化函数
@@ -197,7 +203,7 @@ function SwitchIndex(Page) {
 function PollListData() {
     const MessageList = $("#MainMessageList");
     const MessageEnd = '<div id="FixBlock"></div>';
-    const MessageBlockTemplate = "<div class=\"MessageBlock\" onclick=\"JumpWindow('MessagesWindow', 'RP-Username')\" id='RP-Name'>\n" +
+    const MessageBlockTemplate = "<div class=\"MessageBlock\" onclick=\"JumpWindow('MessagesWindow', 'RP-Username'); ClearRedDot('RP-Username')\" id='RP-Name'>\n" +
         "                <img src=\"img/TestHead.jpeg\" alt=\"portrait\" class=\"rounded-circle portrait\">\n" +
         "                <div class=\"MessageLeft\">\n" +
         "                    <div class=\"MessageTittle\">RP-Tittle</div>\n" +
@@ -215,21 +221,31 @@ function PollListData() {
         async: true,
         timeout: 5000,
         success: function (result) {
-            MessageList.empty();
             const jsons = eval(result);
+            // if (jsons['unread'] === 0 || !InitializedMark) setTimeout("PollListData()", 2000);
             if (jsons === -1) NotLoginKick();
+            MessageList.empty();
+            // InitializedMark = true;
             for (let i = 1; i <= jsons['rows']; i++) {
-                if (jsons['messages'][i]['user_2'] === "验证消息" && jsons['messages'][i]['unread'] !== 0) GetRequestsList();
+                if (jsons['messages'][i]['type'] === 'official') {
+                    if (jsons['messages'][i]['user_2'] === "验证消息" && jsons['messages'][i]['unread'] !== 0)
+                        GetRequestsList();
+                }
                 let MessageBlock = MessageBlockTemplate;
                 MessageBlock = MessageBlock.replace("RP-Tittle", jsons['messages'][i]['user_2']);
                 MessageBlock = MessageBlock.replace("RP-Summary", jsons['messages'][i]['latestMessage']);
                 MessageBlock = MessageBlock.replace("RP-Username", jsons['messages'][i]['user_2']);
+                MessageBlock = MessageBlock.replace("RP-Username", jsons['messages'][i]['user_2']);
                 MessageBlock = MessageBlock.replace("RP-Name", jsons['messages'][i]['user_2']);
-                if (jsons['messages'][i]['unread'] === 0) MessageBlock = MessageBlock.replace("<div class=\"RedDot\">RP-Unread</div>\n", '');
-                else if (jsons['messages'][i]['unread'] > 99)
-                    MessageBlock = MessageBlock.replace("RP-Unread", '99+');
-                else
-                    MessageBlock = MessageBlock.replace("RP-Unread", jsons['messages'][i]['unread']);
+                if (jsons['messages'][i]['unread'] === 0)
+                    MessageBlock = MessageBlock.replace("<div class=\"RedDot\">RP-Unread</div>\n", '');
+                else {
+                    GetMessagesData(jsons['messages'][i]['user_2']);
+                    if (jsons['messages'][i]['unread'] > 99)
+                        MessageBlock = MessageBlock.replace("RP-Unread", '99+');
+                    else
+                        MessageBlock = MessageBlock.replace("RP-Unread", jsons['messages'][i]['unread']);
+                }
                 MessageList.append(MessageBlock);
             }
             MessageList.append(MessageEnd);
@@ -242,8 +258,60 @@ function PollListData() {
 }
 
 //轮询消息数据
-function PollMessagesData() {
-    let FirstAvoid = false;
+function GetMessagesData(username) {
+    if (NowChat[username] === undefined) {
+        NowChat[username] = [];
+        NowChat[username]['MaxID'] = 0;
+        NowChat[username]['total'] = 0;
+        NowChat[username]['messages'] = [];
+    }
+    $.ajax({
+        url: "../Back/messagesCheck.php",
+        type: "POST",
+        dataType: 'jsonp',
+        async: false,
+        timeout: 5000,
+        data: {
+            'username': username,
+            'LastMessageID': NowChat[username]['MaxID'],
+        },
+        success: function (result) {
+            // if (NowChat['username'] === null) {
+            //     setTimeout("PollMessagesData()", 5000);
+            //     return;
+            // }
+            // if (NowChat['username'] !== NowChat['UsrTmp']) {
+            //     MessageArea.empty();
+            //     NowChat['UsrTmp'] = NowChat['username'];
+            // }
+            const jsons = eval(result);
+            if (jsons === -1) NotLoginKick();
+            // if (jsons === -2 && FirstAvoid && WindowStack[WindowStack_Pointer] === "MessagesWindow") {
+            //     alert("你与对方并非好友，会话将被关闭");
+            //     JumpWindow('Main');
+            // }
+            // if (jsons === -2 && FirstAvoid && NowChat['username'] != null) FirstAvoid = true;
+
+            for (let i = 1; i <= jsons['rows']; i++) {
+                NowChat[username]['total']++;
+                NowChat[username]['messages'][NowChat[username]['total']] = [];
+                NowChat[username]['messages'][NowChat[username]['total']]['id'] = jsons[i]['id'];
+                NowChat[username]['messages'][NowChat[username]['total']]['sender'] = jsons[i]['sender'];
+                NowChat[username]['messages'][NowChat[username]['total']]['content'] = jsons[i]['message'];
+                NowChat[username]['messages'][NowChat[username]['total']]['time'] = jsons[i]['sendTime'];
+                NowChat[username]['messages'][NowChat[username]['total']]['state'] = jsons[i]['state'];
+                if (NowChat[username]['MaxID'] < NowChat[username]['messages'][NowChat[username]['total']]['id'])
+                    NowChat[username]['MaxID'] = NowChat[username]['messages'][NowChat[username]['total']]['id'];
+            }
+            // setTimeout("PollMessagesData()", 1000);
+        },
+        error: function () {
+            // PollMessagesData();
+        }
+    });
+}
+
+function ApplyMessagesData(username) {
     const MessageBlockTemplate = '<div class="MessageTime">RP-Time</div>\n' +
         '        <div class="Message RP-Color" id="RP-ID">\n' +
         '            <div class="MessageTop">\n' +
@@ -255,72 +323,18 @@ function PollMessagesData() {
         '        </div>\n' +
         '    </div>';
     const MessageArea = $('#MessagesArea');
-    $.ajax({
-        url: "../Back/messagesCheck.php",
-        type: "POST",
-        dataType: 'jsonp',
-        async: true,
-        timeout: 5000,
-        data: {
-            'username': NowChat['username'],
-            'LastMessageID': NowChat['MaxID'],
-        },
-        success: function (result) {
-            if (NowChat['username'] === null) {
-                setTimeout("PollMessagesData()", 5000);
-                return;
-            }
-            if (NowChat['username'] !== NowChat['UsrTmp']) {
-                MessageArea.empty();
-                NowChat['UsrTmp'] = NowChat['username'];
-            }
-            const jsons = eval(result);
-            if (jsons === -1) NotLoginKick();
-            if (jsons === -2 && FirstAvoid && WindowStack[WindowStack_Pointer] === "MessagesWindow") {
-                alert("你与对方并非好友，会话将被关闭");
-                JumpWindow('Main');
-            }
-            if (jsons === -2 && FirstAvoid && NowChat['username'] != null) FirstAvoid = true;
-
-            for (let i = 1; i <= jsons['rows']; i++) {
-                let MessageBlock = MessageBlockTemplate;
-                NowChat['messages']['total']++;
-                NowChat['messages'][NowChat['messages']['total']] = [];
-                NowChat['messages'][NowChat['messages']['total']]['id'] = jsons[i]['id'];
-                NowChat['messages'][NowChat['messages']['total']]['sender'] = jsons[i]['sender'];
-                NowChat['messages'][NowChat['messages']['total']]['content'] = jsons[i]['message'];
-                NowChat['messages'][NowChat['messages']['total']]['time'] = jsons[i]['sendTime'];
-                NowChat['messages'][NowChat['messages']['total']]['state'] = jsons[i]['state'];
-                if (NowChat['MaxID'] < NowChat['messages'][NowChat['messages']['total']]['id']) NowChat['MaxID'] = NowChat['messages'][NowChat['messages']['total']]['id'];
-                MessageBlock = MessageBlock.replace('RP-Time', getDate(NowChat['messages'][NowChat['messages']['total']]['time'], 'yyyy-MM-dd hh:mm:ss'));
-                let color = null;
-                NowChat['messages'][NowChat['messages']['total']]['sender'] === NowChat['username'] ? color = 'OrangeMessage' : color = 'BlueMessage';
-                MessageBlock = MessageBlock.replace('RP-Color', color);
-                MessageBlock = MessageBlock.replace('RP-Name', NowChat['messages'][NowChat['messages']['total']]['sender']);
-                MessageBlock = MessageBlock.replace('RP-Content', NowChat['messages'][NowChat['messages']['total']]['content']);
-                MessageBlock = MessageBlock.replace('RP-ID', NowChat['messages'][NowChat['messages']['total']]['id']);
-                MessageArea.append(MessageBlock);
-            }
-            setTimeout("PollMessagesData()", 1000);
-        },
-        error: function () {
-            PollMessagesData();
-        }
-    });
-    if (WindowStack[WindowStack_Pointer] === "MessagesWindow")
-        $.ajax({
-            url: "../Back/unreadCheck.php",
-            type: "POST",
-            dataType: 'jsonp',
-            async: true,
-            timeout: 5000,
-            data: {'username': NowChat['username'],},
-            success: function (result) {
-                if (result === -1) NotLoginKick();
-            },
-            error: function () {
-            }
-        });
+    if (NowChat['AppliedMessages'] === 0) MessageArea.empty();
+    for (; NowChat['AppliedMessages'] < NowChat[username]['total']; NowChat['AppliedMessages']++) {
+        let MessageBlock = MessageBlockTemplate;
+        MessageBlock = MessageBlock.replace('RP-Time', getDate(NowChat[username]['messages'][NowChat['AppliedMessages'] + 1]['time'], 'yyyy-MM-dd hh:mm:ss'));
+        let color;
+        NowChat[username]['messages'][NowChat['AppliedMessages'] + 1]['sender'] === NowChat['username'] ? color = 'OrangeMessage' : color = 'BlueMessage';
+        MessageBlock = MessageBlock.replace('RP-Color', color);
+        MessageBlock = MessageBlock.replace('RP-Name', NowChat[username]['messages'][NowChat['AppliedMessages'] + 1]['sender']);
+        MessageBlock = MessageBlock.replace('RP-Content', NowChat[username]['messages'][NowChat['AppliedMessages'] + 1]['content']);
+        MessageBlock = MessageBlock.replace('RP-ID', NowChat[username]['messages'][NowChat['AppliedMessages'] + 1]['id']);
+        MessageArea.append(MessageBlock);
+    }
 }
 
 //发送消息
@@ -359,6 +373,8 @@ function SubmitMessage() {
     if (UserText.val().length > 33) summary = UserText.val().substr(0, 30) + '...';
     $('#' + NowChat['username'] + ' .MessageSummary').html(summary);
     UserText.val('');
+    GetMessagesData(NowChat['username']);
+    ApplyMessagesData(NowChat['username']);
 }
 
 //搜索用户列表
@@ -391,7 +407,7 @@ function SearchFriends() {
             const jsons = eval(result);
             if (jsons === -1) NotLoginKick();
             for (let i = 1; i <= jsons['rows']; i++) {
-                if (jsons[i] === null) continue;
+                if (jsons[i] === undefined || jsons[i] === null) continue;
                 let output = template.replace("RP-Username", jsons[i]['username']);
                 output = output.replace("RP-Username", jsons[i]['username']);
                 output = output.replace("RP-Email", jsons[i]['email']);
@@ -520,14 +536,16 @@ function GetRequestsList() {
             Area.empty();
             let jsons = eval(result);
             if (jsons === -1) NotLoginKick();
-            for (let i = 0; i < jsons['rows']; i++) {
-                if (jsons[i]['requestMessage'].length > 24)
-                    jsons[i]['requestMessage'] = jsons[i]['requestMessage'].substr(0, 21) + '...';
+            for (let i = 1; i <= jsons['rows']; i++) {
                 let Block = template.replace("RP-Username", jsons[i]['sender']);
                 Block = Block.replace("RP-Username", jsons[i]['sender']);
                 Block = Block.replace("RP-Username", jsons[i]['sender']);
-                if (jsons[i]['requestMessage'] == null) Block = Block.replace("RP-Msg", '申请加为好友');
-                else Block = Block.replace("RP-Msg", jsons[i]['requestMessage']);
+                if (jsons[i]['requestMessage'] == null || jsons[i]['requestMessage'] === '') Block = Block.replace("RP-Msg", '申请加为好友');
+                else {
+                    if (jsons[i]['requestMessage'].length > 24)
+                        jsons[i]['requestMessage'] = jsons[i]['requestMessage'].substr(0, 21) + '...';
+                    Block = Block.replace("RP-Msg", jsons[i]['requestMessage']);
+                }
                 Area.append(Block);
                 if (jsons[i]['state'] === 1)
                     $("#Request-" + jsons[i]['sender'] + " button").replaceWith('<div class="AgreedText">已同意</div>');
